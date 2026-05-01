@@ -6,7 +6,7 @@ export function LayoutTiled() {
   const tree = useStore((s) => s.tree);
   return (
     <div style={{ flex: 1, minHeight: 0, display: "flex", position: "relative" }}>
-      <Sidebar width={200} />
+      <Sidebar />
       <div style={{ flex: 1, minWidth: 0, display: "flex", flexDirection: "column", position: "relative" }}>
         <div style={{ flex: 1, minHeight: 0, display: "flex" }}>
           <PaneShell pane={tree} />

@@ -58,6 +58,19 @@ html, body, #root {
   overflow: hidden;
 }
 
+/* No-select on all UI chrome by default. Re-enable on actual content
+   (CodeMirror, xterm) and form inputs. */
+body {
+  user-select: none;
+  -webkit-user-select: none;
+}
+.cm-editor, .cm-content,
+.xterm, .xterm-viewport, .xterm-screen,
+input, textarea {
+  user-select: text;
+  -webkit-user-select: text;
+}
+
 body {
   background-image: var(--bg-base);
 }
@@ -263,16 +276,6 @@ input, textarea { font-family: inherit; color: inherit; }
   z-index: 30;
 }
 
-.drop-zone {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  border: 3px dashed var(--accent);
-  border-radius: var(--frame-radius);
-  background: rgb(var(--decor-rgb) / 0.08);
-  z-index: 5;
-}
-
 .status-bar {
   display: flex;
   align-items: center;
@@ -340,26 +343,22 @@ input, textarea { font-family: inherit; color: inherit; }
 .xterm-viewport, .xterm-screen { background: var(--paper) !important; }
 .xterm-cursor-layer { z-index: 4; }
 
-.split-zones {
-  position: absolute;
-  inset: 0;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  grid-template-rows: 1fr 1fr;
-  pointer-events: none;
-  z-index: 25;
-}
-.split-zones > div {
-  pointer-events: auto;
-  border: 2px dashed transparent;
-}
-.split-zones > div.hover {
-  border-color: var(--accent);
-  background: rgb(var(--decor-rgb) / 0.1);
-}
-
 .mac-traffic-pad {
   width: 76px;
   height: 28px;
   flex-shrink: 0;
+}
+
+/* Pane reorder drop zones (4-way + center). One div per region, sized via
+   inline style. Visible only while another pane is being dragged. */
+.drop-zone {
+  position: absolute;
+  background: transparent;
+  transition: background 80ms ease;
+  pointer-events: auto;
+}
+.drop-zone.hot {
+  background: var(--accent-soft);
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
 }

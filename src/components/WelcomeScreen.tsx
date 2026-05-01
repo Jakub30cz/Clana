@@ -1,14 +1,23 @@
 import { Glyph } from "@/lib/glyphs";
-import { useStore } from "@/state/store";
-import { openFolderDialog } from "@/lib/dialog";
+import { useStore, type RecentEntry } from "@/state/store";
+import { loadWorkspaceFromDisk } from "@/lib/workspaceFile";
 
 export function WelcomeScreen() {
-  const recent = useStore((s) => s.recentWorkspaces);
-  const openWorkspace = useStore((s) => s.openWorkspace);
+  const recent = useStore((s) => s.recentEntries);
+  const openFolder = useStore((s) => s.openFolder);
+  const openWorkspaceFile = useStore((s) => s.openWorkspaceFile);
 
-  const pick = async () => {
-    const path = await openFolderDialog();
-    if (path) openWorkspace(path);
+  const onClickRecent = async (r: RecentEntry) => {
+    if (r.kind === "folder") {
+      openFolder(r.path);
+    } else {
+      try {
+        const ws = await loadWorkspaceFromDisk(r.filePath);
+        openWorkspaceFile(r.filePath, ws);
+      } catch (e) {
+        console.error("failed to load workspace", e);
+      }
+    }
   };
 
   return (
@@ -32,36 +41,54 @@ export function WelcomeScreen() {
           textAlign: "left",
         }}
       >
-        <div
-          className="hand-title"
-          style={{ fontSize: 30, marginBottom: 4, color: "var(--ink)" }}
-        >
-          Welcome to Clana
-        </div>
-        <div
-          className="hand-label"
-          style={{ fontSize: 14, color: "var(--ink-soft)", marginBottom: 18 }}
-        >
-          A minimalist vibe-coding IDE. Files, splits, terminal,
-          and Claude — at one keystroke.
+        <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 12 }}>
+          <img
+            src="/logo.png"
+            alt="Clana"
+            width={56}
+            height={56}
+            style={{ borderRadius: 12, flexShrink: 0 }}
+          />
+          <div style={{ minWidth: 0 }}>
+            <div
+              className="hand-title"
+              style={{ fontSize: 30, lineHeight: 1, color: "var(--ink)" }}
+            >
+              Welcome to Clana
+            </div>
+            <div
+              className="hand-label"
+              style={{ fontSize: 14, color: "var(--ink-soft)", marginTop: 2 }}
+            >
+              A minimalist vibe-coding IDE. Files, splits, terminal, and Claude — at one keystroke.
+            </div>
+          </div>
         </div>
 
-        <button
-          className="sketch-btn primary"
-          onClick={pick}
+        <div
+          className="sketch-frame"
           style={{
             display: "flex",
             alignItems: "center",
-            gap: 10,
-            fontSize: 15,
-            padding: "8px 14px",
-            transform: "none",
+            gap: 12,
+            padding: "14px 16px",
+            background: "var(--paper-2)",
+            borderStyle: "dashed",
+            color: "var(--ink-soft)",
           }}
         >
-          <Glyph name="folder" size={16} />
-          <span>Open folder…</span>
-          <span className="kbd" style={{ marginLeft: 8 }}>⌘O</span>
-        </button>
+          <Glyph name="folder" size={18} />
+          <div style={{ flex: 1, fontSize: 13, lineHeight: 1.4 }}>
+            <div style={{ fontWeight: 600, color: "var(--ink)" }}>
+              Drop a folder here
+            </div>
+            <div style={{ fontSize: 12, color: "var(--ink-faint)" }}>
+              or use <span className="kbd">File &gt; Open Folder</span>{" "}
+              <span className="kbd">⌘O</span> to open one. Drop multiple
+              folders to start a workspace.
+            </div>
+          </div>
+        </div>
 
         {recent.length > 0 && (
           <div style={{ marginTop: 22 }}>
@@ -78,31 +105,53 @@ export function WelcomeScreen() {
               Recent
             </div>
             <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-              {recent.slice(0, 6).map((r) => (
-                <div
-                  key={r.path}
-                  className="side-item"
-                  style={{ padding: "8px 10px", fontSize: 13, gap: 10 }}
-                  onClick={() => openWorkspace(r.path)}
-                >
-                  <Glyph name="folder" size={13} />
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontWeight: 600 }}>{r.name}</div>
-                    <div
-                      style={{
-                        fontSize: 11,
-                        color: "var(--ink-faint)",
-                        fontFamily: "var(--font-mono)",
-                        overflow: "hidden",
-                        textOverflow: "ellipsis",
-                        whiteSpace: "nowrap",
-                      }}
-                    >
-                      {r.path}
+              {recent.slice(0, 6).map((r) => {
+                const subPath = r.kind === "folder" ? r.path : r.filePath;
+                const icon = r.kind === "folder" ? "folder" : "doc";
+                return (
+                  <div
+                    key={`${r.kind}:${subPath}`}
+                    className="side-item"
+                    style={{ padding: "8px 10px", fontSize: 13, gap: 10 }}
+                    onClick={() => onClickRecent(r)}
+                  >
+                    <Glyph name={icon} size={13} />
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ fontWeight: 600 }}>
+                        {r.name}
+                        {r.kind === "workspace" && (
+                          <span
+                            style={{
+                              fontSize: 10,
+                              marginLeft: 8,
+                              padding: "1px 6px",
+                              borderRadius: 8,
+                              background: "var(--accent-soft)",
+                              color: "var(--accent)",
+                              fontFamily: "var(--font-mono)",
+                              textTransform: "uppercase",
+                            }}
+                          >
+                            workspace
+                          </span>
+                        )}
+                      </div>
+                      <div
+                        style={{
+                          fontSize: 11,
+                          color: "var(--ink-faint)",
+                          fontFamily: "var(--font-mono)",
+                          overflow: "hidden",
+                          textOverflow: "ellipsis",
+                          whiteSpace: "nowrap",
+                        }}
+                      >
+                        {subPath}
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
         )}

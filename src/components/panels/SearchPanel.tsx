@@ -5,8 +5,7 @@ import { useStore } from "@/state/store";
 
 export function SearchPanel() {
   const workdir = useStore((s) => s.workdir);
-  const activePaneId = useStore((s) => s.activePaneId);
-  const openFileInPane = useStore((s) => s.openFileInPane);
+  const openFile = useStore((s) => s.openFile);
   const [query, setQuery] = useState("");
   const [hits, setHits] = useState<SearchHit[]>([]);
   const [busy, setBusy] = useState(false);
@@ -50,7 +49,7 @@ export function SearchPanel() {
               style={{ fontWeight: 700, fontSize: 12 }}
               onClick={async () => {
                 const text = await safeIpc(() => ipc.readText(path), "");
-                openFileInPane(activePaneId, path, path.split("/").pop() ?? path, text);
+                openFile(path, path.split("/").pop() ?? path, text);
               }}
             >
               <Glyph name="chevron-d" size={10} />

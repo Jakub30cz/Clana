@@ -1,7 +1,6 @@
 import { useEffect } from "react";
 import { useStore } from "@/state/store";
 import type { LayoutMode } from "@/state/layouts";
-import { openFolderDialog } from "@/lib/dialog";
 
 const isMac = typeof navigator !== "undefined" && /Mac|iPhone|iPad/.test(navigator.platform);
 
@@ -50,14 +49,7 @@ export function useGlobalKeymap() {
         return;
       }
 
-      // ⌘O — open folder
-      if (mod(e) && e.key.toLowerCase() === "o" && !e.shiftKey) {
-        e.preventDefault();
-        openFolderDialog(s.workdir || undefined).then((path) => {
-          if (path) useStore.getState().openWorkspace(path);
-        });
-        return;
-      }
+      // ⌘O — owned by the native File menu accelerator (see src-tauri/src/menu.rs)
 
       // ⌘1-3 — switch layout
       if (mod(e) && ["1", "2", "3"].includes(e.key)) {

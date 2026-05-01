@@ -54,3 +54,91 @@ pub async fn write_text(path: String, contents: String) -> Result<(), String> {
 pub async fn path_exists(path: String) -> bool {
     tokio::fs::try_exists(&path).await.unwrap_or(false)
 }
+
+#[tauri::command]
+pub async fn path_is_dir(path: String) -> bool {
+    match tokio::fs::metadata(&path).await {
+        Ok(m) => m.is_dir(),
+        Err(_) => false,
+    }
+}
+
+#[tauri::command]
+pub async fn create_file(path: String) -> Result<(), String> {
+    if tokio::fs::try_exists(&path).await.unwrap_or(false) {
+        return Err(format!("path already exists: {}", path));
+    }
+    if let Some(parent) = std::path::Path::new(&path).parent() {
+        tokio::fs::create_dir_all(parent).await.map_err(|e| e.to_string())?;
+    }
+    tokio::fs::write(&path, b"").await.map_err(|e| e.to_string())
+}
+
+#[tauri::command]
+pub async fn create_dir(path: String) -> Result<(), String> {
+    if tokio::fs::try_exists(&path).await.unwrap_or(false) {
+        return Err(format!("path already exists: {}", path));
+    }
+    tokio::fs::create_dir_all(&path).await.map_err(|e| e.to_string())
+}
+
+#[tauri::command]
+pub async fn rename_path(from: String, to: String) -> Result<(), String> {
+    if from == to {
+        return Ok(());
+    }
+    // Disallow moving a directory inside itself.
+    let from_p = std::path::PathBuf::from(&from);
+    let to_p = std::path::PathBuf::from(&to);
+    if to_p.starts_with(&from_p) {
+        return Err("refusing to move a path into itself".into());
+    }
+    if tokio::fs::try_exists(&to).await.unwrap_or(false) {
+        return Err(format!("target already exists: {}", to));
+    }
+    tokio::fs::rename(&from, &to).await.map_err(|e| e.to_string())
+}
+
+#[tauri::command]
+pub async fn delete_path(path: String) -> Result<(), String> {
+    let meta = tokio::fs::metadata(&path).await.map_err(|e| e.to_string())?;
+    if meta.is_dir() {
+        tokio::fs::remove_dir_all(&path).await.map_err(|e| e.to_string())
+    } else {
+        tokio::fs::remove_file(&path).await.map_err(|e| e.to_string())
+    }
+}
+
+#[tauri::command]
+pub fn reveal_in_explorer(path: String) -> Result<(), String> {
+    use std::process::Command;
+
+    #[cfg(target_os = "macos")]
+    {
+        Command::new("open")
+            .args(["-R", &path])
+            .spawn()
+            .map(|_| ())
+            .map_err(|e| e.to_string())
+    }
+    #[cfg(target_os = "windows")]
+    {
+        Command::new("explorer")
+            .arg(format!("/select,{}", path))
+            .spawn()
+            .map(|_| ())
+            .map_err(|e| e.to_string())
+    }
+    #[cfg(all(unix, not(target_os = "macos")))]
+    {
+        let parent = std::path::Path::new(&path)
+            .parent()
+            .map(|p| p.to_string_lossy().into_owned())
+            .unwrap_or_else(|| ".".into());
+        Command::new("xdg-open")
+            .arg(&parent)
+            .spawn()
+            .map(|_| ())
+            .map_err(|e| e.to_string())
+    }
+}

@@ -20,12 +20,18 @@ importers:
       '@codemirror/lang-rust':
         specifier: ^6.0.1
         version: 6.0.2
+      '@codemirror/language':
+        specifier: ^6.12.0
+        version: 6.12.3
       '@codemirror/state':
         specifier: ^6.4.1
         version: 6.6.0
       '@codemirror/view':
         specifier: ^6.34.1
         version: 6.41.1
+      '@lezer/highlight':
+        specifier: ^1.2.0
+        version: 1.2.3
       '@tauri-apps/api':
         specifier: ^2.1.1
         version: 2.11.0

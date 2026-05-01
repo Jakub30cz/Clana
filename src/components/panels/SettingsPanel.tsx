@@ -1,5 +1,6 @@
 import clsx from "clsx";
 import { ACCENTS, AccentName, ColorMode, ThemeName, useStore } from "@/state/store";
+import { SYNTAX_PALETTES } from "@/lib/editorTheme";
 
 const ACCENT_NAMES: AccentName[] = ["blue", "amber", "teal", "rose", "green", "violet"];
 
@@ -62,6 +63,8 @@ export function SettingsPanel() {
   const setMode = useStore((s) => s.setMode);
   const claudePrefill = useStore((s) => s.claudePrefill);
   const setClaudePrefill = useStore((s) => s.setClaudePrefill);
+  const syntaxPalette = useStore((s) => s.syntaxPalette);
+  const setSyntaxPalette = useStore((s) => s.setSyntaxPalette);
 
   const previewMode: "light" | "dark" =
     mode === "auto"
@@ -73,12 +76,12 @@ export function SettingsPanel() {
   return (
     <div
       className="no-scroll-chrome"
-      style={{ padding: "10px 12px", fontFamily: "var(--font-hand)", fontSize: 13, overflow: "auto", flex: 1 }}
+      style={{ padding: "10px 10px", fontFamily: "var(--font-hand)", fontSize: 13, overflow: "auto", flex: 1 }}
     >
       <div className="hand-title" style={{ fontSize: 18, marginBottom: 8 }}>Settings</div>
 
       <Group label="Appearance">
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))", gap: 8 }}>
           {THEMES.map((t) => (
             <ThemeCard
               key={t.id}
@@ -128,10 +131,54 @@ export function SettingsPanel() {
         </div>
       </Group>
 
+      <Group label="Syntax highlighting">
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))", gap: 8 }}>
+          {SYNTAX_PALETTES.map((p) => (
+            <button
+              key={p.id}
+              onClick={() => setSyntaxPalette(p.id)}
+              className="sketch-frame"
+              style={{
+                padding: "8px 10px",
+                cursor: "pointer",
+                background: "var(--paper)",
+                color: "var(--ink)",
+                textAlign: "left",
+                outline: syntaxPalette === p.id ? "2px solid var(--accent)" : "none",
+                outlineOffset: -2,
+                border: "1.5px solid var(--rule)",
+                transform: "none",
+                boxShadow: syntaxPalette === p.id ? "var(--frame-shadow)" : "none",
+              }}
+            >
+              <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 4 }}>
+                <span style={{ fontWeight: 700, fontSize: 14 }}>{p.label}</span>
+                <span style={{ flex: 1 }} />
+                <span style={{ display: "inline-flex", gap: 3 }}>
+                  {p.swatch.map((c, i) => (
+                    <span
+                      key={i}
+                      style={{
+                        width: 8,
+                        height: 8,
+                        background: c,
+                        borderRadius: "50%",
+                        border: "1px solid rgb(var(--decor-rgb) / 0.2)",
+                      }}
+                    />
+                  ))}
+                </span>
+              </div>
+              <div style={{ fontSize: 11, color: "var(--ink-faint)", lineHeight: 1.35, overflowWrap: "anywhere" }}>{p.description}</div>
+            </button>
+          ))}
+        </div>
+      </Group>
+
       <Group label="Workspace">
         <ToggleRow
           label="Pre-fill Claude with workspace context"
-          hint="When you open a Claude pane, types &ldquo;Pracuju ve workspace …&rdquo; into the prompt. Press Enter to send."
+          hint="When you open a Claude pane in a multi-folder workspace, types the project list into the prompt. Press Enter to send. Single-folder windows are not pre-filled."
           value={claudePrefill}
           onChange={setClaudePrefill}
         />
@@ -219,6 +266,7 @@ function ThemeCard({ meta, active, previewMode, onClick }: ThemeCardProps) {
           color: previewMode === "dark" ? "rgba(255,255,255,0.55)" : "rgba(0,0,0,0.55)",
           fontFamily: meta.fontStack,
           lineHeight: 1.4,
+          overflowWrap: "anywhere",
         }}
       >
         {meta.description}

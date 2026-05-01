@@ -14,6 +14,7 @@ export type GlyphName =
   | "chevron"
   | "chevron-d"
   | "folder"
+  | "folder-open"
   | "doc"
   | "sparkle"
   | "branch"
@@ -130,6 +131,13 @@ export function Glyph({ name, size = 14, color = "currentColor", style }: GlyphP
       return (
         <svg viewBox="0 0 16 16" style={s}>
           <path {...stroke} d="M2 4.5 h4 l1.2 1.4 h6.8 v7 H2 z" />
+        </svg>
+      );
+    case "folder-open":
+      return (
+        <svg viewBox="0 0 16 16" style={s}>
+          <path {...stroke} d="M2 4.5 h4 l1.2 1.4 h6.8 v1.4" />
+          <path {...stroke} d="M2 13 V6.4 H14 L12.4 13 Z" />
         </svg>
       );
     case "doc":

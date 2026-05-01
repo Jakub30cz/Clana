@@ -3,23 +3,25 @@ import { FileTree } from "./panels/FileTree";
 import { GitPanel } from "./panels/GitPanel";
 import { SearchPanel } from "./panels/SearchPanel";
 import { SettingsPanel } from "./panels/SettingsPanel";
+import { SidebarResizer } from "./SidebarResizer";
 import { useStore } from "@/state/store";
 
 const ITEMS: ActivityItem[] = [
   { id: "files", icon: "files", label: "Files" },
   { id: "search", icon: "search", label: "Search" },
-  { id: "git", icon: "git", label: "Git" },
+  { id: "git", icon: "git", label: "Branches" },
   { id: "settings", icon: "settings", label: "Settings" },
 ];
 
 interface Props {
-  width?: number;
   side?: "left" | "right";
 }
 
-export function Sidebar({ width = 240, side = "left" }: Props) {
+export function Sidebar({ side = "left" }: Props) {
   const panel = useStore((s) => s.sidePanel);
   const setPanel = useStore((s) => s.setSidePanel);
+  const width = useStore((s) => s.sidebarWidth);
+  const setWidth = useStore((s) => s.setSidebarWidth);
 
   const activity = (
     <ActivityBar
@@ -64,8 +66,11 @@ export function Sidebar({ width = 240, side = "left" }: Props) {
     </div>
   ) : null;
 
+  const handle = panel ? <SidebarResizer width={width} setWidth={setWidth} side={side} /> : null;
+
   return side === "right" ? (
     <>
+      {handle}
       {body}
       {activity}
     </>
@@ -73,6 +78,7 @@ export function Sidebar({ width = 240, side = "left" }: Props) {
     <>
       {activity}
       {body}
+      {handle}
     </>
   );
 }

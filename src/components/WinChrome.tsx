@@ -1,6 +1,5 @@
 import { ReactNode } from "react";
 import { LayoutSwitcher } from "./LayoutSwitcher";
-import { WorkspacePicker } from "./WorkspacePicker";
 import { PaneToolbar } from "./PaneToolbar";
 import { useStore } from "@/state/store";
 
@@ -12,7 +11,14 @@ interface Props {
 
 export function WinChrome({ title = "clana", subtitle, children }: Props) {
   const layout = useStore((s) => s.layout);
-  const sub = subtitle ?? layoutSubtitle(layout);
+  const workdir = useStore((s) => s.workdir);
+  const workspace = useStore((s) => s.workspace);
+  const folderLabel = workspace
+    ? workspace.name || "Untitled Workspace"
+    : workdir
+      ? basename(workdir)
+      : "";
+  const sub = subtitle ?? [folderLabel, layoutSubtitle(layout)].filter(Boolean).join(" · ");
 
   return (
     <div className="sketch-frame" style={{
@@ -37,7 +43,6 @@ export function WinChrome({ title = "clana", subtitle, children }: Props) {
       >
         {/* macOS overlay leaves space for traffic lights via padding */}
         <div className="mac-traffic-pad" />
-        <WorkspacePicker />
         <div style={{
           flex: 1, textAlign: "center",
           fontFamily: "var(--font-hand)", fontSize: 13,
@@ -55,6 +60,11 @@ export function WinChrome({ title = "clana", subtitle, children }: Props) {
       </div>
     </div>
   );
+}
+
+function basename(p: string): string {
+  const parts = p.replace(/[\\/]+$/, "").split(/[\\/]/);
+  return parts[parts.length - 1] || p;
 }
 
 function layoutSubtitle(layout: string): string {

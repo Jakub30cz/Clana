@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo } from "react";
 import CodeMirror, { Extension } from "@uiw/react-codemirror";
 import { javascript } from "@codemirror/lang-javascript";
 import { markdown } from "@codemirror/lang-markdown";
@@ -8,37 +8,25 @@ import { EditorView } from "@codemirror/view";
 import { PaneLeaf } from "@/lib/paneTree";
 import { useStore } from "@/state/store";
 import { ipc, safeIpc } from "@/lib/ipc";
+import { buildEditorTheme } from "@/lib/editorTheme";
+import { useResolvedColorMode } from "@/lib/useResolvedColorMode";
+import { TabStrip } from "./TabStrip";
 
 interface Props {
   pane: PaneLeaf;
 }
 
-const SAMPLE_README = `# Clana
-
-a tiny vibe-coding ide.
-files, splits, terminal, claude — at a keystroke.
-
-## try it
-
-- ⌘K — command palette
-- ⌘J — claude in a new pane
-- ⌃\` — new terminal
-- ⌘\\\\ — split right
-- ⌘1 / ⌘2 / ⌘3 / ⌘4 — switch layout
-
-open a folder via the file panel on the left to start.
-`;
-
 export function EditorPane({ pane }: Props) {
   const openFiles = useStore((s) => s.openFiles);
   const setFileContents = useStore((s) => s.setFileContents);
   const markFileSaved = useStore((s) => s.markFileSaved);
-  const [welcome] = useState(SAMPLE_README);
+  const theme = useStore((s) => s.theme);
+  const syntaxPalette = useStore((s) => s.syntaxPalette);
+  const resolvedMode = useResolvedColorMode();
 
-  const path = pane.filePath;
+  const path = pane.activeTab;
   const file = path ? openFiles[path] : undefined;
-  const text = file?.contents ?? welcome;
-  const name = file?.name ?? pane.name ?? "welcome.md";
+  const name = file?.name ?? pane.name ?? "untitled";
 
   const ext = useMemo<Extension[]>(() => {
     const ext = name.split(".").pop()?.toLowerCase() ?? "md";
@@ -52,9 +40,10 @@ export function EditorPane({ pane }: Props) {
     } else if (ext === "md" || ext === "markdown") {
       langs.push(markdown());
     }
+    langs.push(...buildEditorTheme(syntaxPalette, theme, resolvedMode));
     langs.push(EditorView.lineWrapping);
     return langs;
-  }, [name]);
+  }, [name, syntaxPalette, theme, resolvedMode]);
 
   useEffect(() => {
     const onSave = (e: KeyboardEvent) => {
@@ -73,45 +62,72 @@ export function EditorPane({ pane }: Props) {
 
   return (
     <div style={{ display: "flex", flexDirection: "column", flex: 1, minHeight: 0, background: "var(--paper)" }}>
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          gap: 4,
-          padding: "4px 8px",
-          background: "var(--paper-2)",
-          borderBottom: "1px dashed var(--rule)",
-          fontSize: 12,
-          fontFamily: "var(--hand)",
-        }}
-      >
-        <span style={{ fontWeight: 600 }}>{name}</span>
-        {file?.dirty && <span style={{ color: "var(--accent)" }}>●</span>}
-        <span style={{ flex: 1 }} />
-        {path && <span style={{ color: "var(--ink-faint)", fontSize: 11 }}>{shortPath(path)}</span>}
-      </div>
+      <TabStrip pane={pane} />
       <div style={{ flex: 1, minHeight: 0, overflow: "auto" }}>
-        <CodeMirror
-          value={text}
-          height="100%"
-          extensions={ext}
-          basicSetup={{
-            lineNumbers: true,
-            foldGutter: false,
-            highlightActiveLine: true,
-            indentOnInput: true,
-            bracketMatching: true,
-          }}
-          onChange={(v) => {
-            if (path) setFileContents(path, v);
-          }}
-        />
+        {file && path ? (
+          <CodeMirror
+            key={path}
+            value={file.contents}
+            height="100%"
+            extensions={ext}
+            basicSetup={{
+              lineNumbers: true,
+              foldGutter: false,
+              highlightActiveLine: true,
+              indentOnInput: true,
+              bracketMatching: true,
+            }}
+            onChange={(v) => setFileContents(path, v)}
+          />
+        ) : (
+          <EmptyEditorBackground />
+        )}
       </div>
     </div>
   );
 }
 
-function shortPath(p: string): string {
-  const parts = p.split("/");
-  return parts.length <= 3 ? p : ".../" + parts.slice(-3).join("/");
+function EmptyEditorBackground() {
+  return (
+    <div
+      style={{
+        height: "100%",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        gap: 14,
+        color: "var(--ink-faint)",
+        userSelect: "none",
+        pointerEvents: "none",
+        padding: 24,
+      }}
+    >
+      <img
+        src="/logo.png"
+        alt=""
+        width={84}
+        height={84}
+        style={{ opacity: 0.55, borderRadius: 18 }}
+      />
+      <div
+        className="hand-title"
+        style={{ fontSize: 22, color: "var(--ink-soft)" }}
+      >
+        Clana
+      </div>
+      <div
+        style={{
+          fontSize: 12,
+          fontFamily: "var(--font-hand)",
+          textAlign: "center",
+          maxWidth: 360,
+          lineHeight: 1.6,
+        }}
+      >
+        Pick a file from the sidebar, or use{" "}
+        <span className="kbd">⌘K</span> for the command palette.
+      </div>
+    </div>
+  );
 }

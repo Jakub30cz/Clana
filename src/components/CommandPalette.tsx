@@ -36,8 +36,10 @@ export function CommandPalette() {
         label: "Open folder…",
         kbd: "⌘O",
         run: async () => {
-          const path = await openFolderDialog(useStore.getState().workdir || undefined);
-          if (path) useStore.getState().openWorkspace(path);
+          const path = await openFolderDialog(
+            useStore.getState().getPrimaryFolder() || undefined
+          );
+          if (path) useStore.getState().openFolder(path);
         },
       },
       {

@@ -9,6 +9,10 @@ import { LayoutTiled } from "@/layouts/LayoutTiled";
 import { ACCENTS, ACCENT_SOFT_DARK, ACCENT_SOFT_LIGHT, useStore } from "@/state/store";
 import { useGlobalKeymap } from "@/lib/keymap";
 import { useMenuEvents } from "@/lib/menuEvents";
+import { useFolderDrop } from "@/lib/dragDrop";
+import { DragGhost } from "@/components/DragGhost";
+import { activeTerminalIds, disposeTerminal } from "@/lib/terminalRegistry";
+import { listLeaves } from "@/lib/paneTree";
 
 export default function App() {
   const layout = useStore((s) => s.layout);
@@ -16,9 +20,24 @@ export default function App() {
   const theme = useStore((s) => s.theme);
   const mode = useStore((s) => s.mode);
   const workdir = useStore((s) => s.workdir);
+  const workspace = useStore((s) => s.workspace);
+  const hasFolder = Boolean(workdir || workspace);
 
   useGlobalKeymap();
   useMenuEvents();
+  useFolderDrop();
+
+  // Dispose terminal entries whose pane has truly disappeared from the tree.
+  // Pane reorders don't fire this — only user-initiated close.
+  useEffect(() => {
+    return useStore.subscribe((state, prev) => {
+      if (state.tree === prev.tree) return;
+      const live = new Set(listLeaves(state.tree).map((l) => l.id));
+      for (const id of activeTerminalIds()) {
+        if (!live.has(id)) disposeTerminal(id);
+      }
+    });
+  }, []);
 
   // Apply theme + mode on document root.
   useEffect(() => {
@@ -50,7 +69,7 @@ export default function App() {
   return (
     <WinChrome>
       <CommandPalette />
-      {!workdir ? (
+      {!hasFolder ? (
         <WelcomeScreen />
       ) : (
         <>
@@ -60,6 +79,7 @@ export default function App() {
         </>
       )}
       <StatusBar />
+      <DragGhost />
     </WinChrome>
   );
 }
