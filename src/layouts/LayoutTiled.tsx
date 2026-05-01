@@ -1,0 +1,19 @@
+import { Sidebar } from "@/components/Sidebar";
+import { PaneShell } from "@/components/panes/PaneShell";
+import { SplitPaletteFAB } from "@/components/SplitPaletteFAB";
+import { useStore } from "@/state/store";
+
+export function LayoutTiled() {
+  const tree = useStore((s) => s.tree);
+  return (
+    <div style={{ flex: 1, minHeight: 0, display: "flex", position: "relative" }}>
+      <Sidebar width={200} />
+      <div style={{ flex: 1, minWidth: 0, display: "flex", flexDirection: "column", position: "relative" }}>
+        <div style={{ flex: 1, minHeight: 0, display: "flex" }}>
+          <PaneShell pane={tree} />
+        </div>
+      </div>
+      <SplitPaletteFAB />
+    </div>
+  );
+}

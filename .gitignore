@@ -1,0 +1,39 @@
+# dependencies
+node_modules/
+.pnpm-store/
+
+# build output
+dist/
+dist-ssr/
+*.local
+
+# tauri
+src-tauri/target/
+src-tauri/gen/
+src-tauri/Cargo.lock
+src-tauri/WixTools/
+
+# editor / OS
+.DS_Store
+.idea/
+.vscode/*
+!.vscode/extensions.json
+*.swp
+*.swo
+*~
+
+# logs
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+
+# env
+.env
+.env.local
+.env.*.local
+
+# misc
+*.tsbuildinfo
+coverage/
+.claude/
+.tsbuild-node/

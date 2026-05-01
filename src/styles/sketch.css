@@ -1,0 +1,341 @@
+/* Sketchy IDE wireframe styles — ported from the design prototype */
+
+:root {
+  --paper: #f7f3ea;
+  --paper-2: #efe9da;
+  --ink: #1f1d1a;
+  --ink-soft: #4a463f;
+  --ink-faint: #8a857a;
+  --rule: #2a2722;
+  --accent: oklch(0.68 0.16 50);
+  --accent-soft: oklch(0.92 0.05 60);
+  --accent-2: oklch(0.72 0.13 200);
+  --hand: 'Kalam', 'Caveat', cursive;
+  --display: 'Caveat', cursive;
+  --mono: 'JetBrains Mono', ui-monospace, monospace;
+}
+
+* { box-sizing: border-box; }
+
+html, body, #root {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  background: #ddd6c5;
+  font-family: var(--hand);
+  color: var(--ink);
+  overflow: hidden;
+}
+
+body {
+  background-image: radial-gradient(ellipse at top, #e3dcc7, #d2c9b1);
+}
+
+button {
+  font-family: inherit;
+  color: inherit;
+}
+
+input, textarea {
+  font-family: inherit;
+  color: inherit;
+}
+
+/* ─── Sketchy primitives ─── */
+
+.sketch-frame {
+  position: relative;
+  background: var(--paper);
+  border: 2px solid var(--rule);
+  border-radius: 6px;
+  box-shadow: 2px 2px 0 var(--rule);
+}
+
+.sketch-frame.dashed { border-style: dashed; }
+.sketch-frame.thin {
+  border-width: 1.5px;
+  box-shadow: 1.5px 1.5px 0 var(--rule);
+}
+
+.scribble-underline { position: relative; display: inline-block; }
+.scribble-underline::after {
+  content: "";
+  position: absolute;
+  left: -2px; right: -2px; bottom: -4px;
+  height: 6px;
+  background: radial-gradient(ellipse 50% 100% at 50% 0%, var(--accent) 60%, transparent 62%);
+  opacity: 0.7;
+  border-radius: 50%;
+}
+
+.hand-label { font-family: var(--hand); font-weight: 400; letter-spacing: 0.2px; }
+.hand-title { font-family: var(--display); font-weight: 600; letter-spacing: 0.3px; }
+
+.hatch {
+  background-image: repeating-linear-gradient(-45deg, transparent 0 6px, rgba(31,29,26,0.07) 6px 7px);
+}
+.hatch-strong {
+  background-image: repeating-linear-gradient(-45deg, transparent 0 5px, rgba(31,29,26,0.13) 5px 6.5px);
+}
+.dot-grid {
+  background-image: radial-gradient(rgba(31,29,26,0.18) 1px, transparent 1.2px);
+  background-size: 14px 14px;
+}
+.paper-noise {
+  background-color: var(--paper);
+  background-image:
+    radial-gradient(rgba(0,0,0,0.025) 1px, transparent 1px),
+    radial-gradient(rgba(0,0,0,0.02) 1px, transparent 1px);
+  background-size: 3px 3px, 7px 7px;
+  background-position: 0 0, 1px 2px;
+}
+
+.squiggle {
+  width: 100%;
+  height: 8px;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 80 8' preserveAspectRatio='none'><path d='M0 4 Q 5 0, 10 4 T 20 4 T 30 4 T 40 4 T 50 4 T 60 4 T 70 4 T 80 4' fill='none' stroke='%231f1d1a' stroke-width='1.2'/></svg>");
+  background-repeat: repeat-x;
+  background-size: 80px 8px;
+}
+
+/* tab shape */
+.sketch-tab {
+  position: relative;
+  padding: 6px 14px 6px 12px;
+  border: 1.5px solid var(--rule);
+  border-bottom: none;
+  border-radius: 6px 8px 0 0;
+  background: var(--paper-2);
+  font-family: var(--hand);
+  font-size: 13px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  transform: rotate(-0.4deg);
+  white-space: nowrap;
+}
+.sketch-tab.active {
+  background: var(--paper);
+  font-weight: 700;
+  transform: rotate(0.2deg);
+  box-shadow: 0 -2px 0 var(--accent) inset;
+}
+.sketch-tab .x {
+  opacity: 0.45;
+  font-family: var(--mono);
+  font-size: 11px;
+}
+.sketch-tab .x:hover { opacity: 1; }
+
+.side-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 10px;
+  font-family: var(--hand);
+  font-size: 14px;
+  color: var(--ink);
+  cursor: pointer;
+  border-radius: 3px;
+  white-space: nowrap;
+}
+.side-item:hover { background: rgba(31,29,26,0.06); }
+.side-item.active {
+  background: var(--accent-soft);
+  font-weight: 700;
+}
+.side-item .glyph {
+  width: 14px;
+  display: inline-flex;
+  justify-content: center;
+  flex-shrink: 0;
+  color: var(--ink-soft);
+}
+
+.act-icon {
+  width: 36px;
+  height: 36px;
+  display: grid;
+  place-items: center;
+  border: 1.5px solid transparent;
+  border-radius: 6px;
+  cursor: pointer;
+  color: var(--ink-soft);
+  position: relative;
+  background: transparent;
+}
+.act-icon:hover { background: rgba(31,29,26,0.05); }
+.act-icon.active {
+  border-color: var(--rule);
+  background: var(--paper);
+  color: var(--ink);
+  box-shadow: 1.5px 1.5px 0 var(--rule);
+}
+.act-icon.active::before {
+  content: "";
+  position: absolute;
+  left: -6px;
+  top: 6px; bottom: 6px;
+  width: 3px;
+  background: var(--accent);
+  border-radius: 2px;
+}
+
+.sketch-btn {
+  font-family: var(--hand);
+  font-size: 13px;
+  padding: 4px 10px;
+  border: 1.5px solid var(--rule);
+  border-radius: 5px;
+  background: var(--paper);
+  cursor: pointer;
+  box-shadow: 1.5px 1.5px 0 var(--rule);
+  transform: rotate(-0.3deg);
+  user-select: none;
+}
+.sketch-btn:hover { background: var(--accent-soft); }
+.sketch-btn:active {
+  transform: translate(1px, 1px) rotate(-0.3deg);
+  box-shadow: 0 0 0 var(--rule);
+}
+.sketch-btn.primary {
+  background: var(--accent);
+  color: #1f1d1a;
+}
+
+.term-line {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--ink);
+  white-space: pre-wrap;
+  line-height: 1.5;
+}
+.term-line .prompt { color: var(--accent); font-weight: 600; }
+.term-line .dim { color: var(--ink-faint); }
+.term-line .acc { color: var(--accent); }
+.term-line .blu { color: var(--accent-2); }
+
+.caret {
+  display: inline-block;
+  width: 7px;
+  height: 13px;
+  background: var(--ink);
+  vertical-align: -2px;
+  animation: blink 1s steps(1) infinite;
+}
+@keyframes blink { 50% { opacity: 0; } }
+
+.palette-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(31,29,26,0.18);
+  backdrop-filter: blur(2px);
+  display: grid;
+  place-items: start center;
+  padding-top: 80px;
+  z-index: 30;
+}
+
+.drop-zone {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border: 3px dashed var(--accent);
+  border-radius: 6px;
+  background: rgba(255, 165, 80, 0.08);
+  z-index: 5;
+}
+
+.status-bar {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 4px 12px;
+  border-top: 1.5px solid var(--rule);
+  background: var(--paper-2);
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--ink-soft);
+}
+
+.resizer {
+  background: rgba(31,29,26,0.15);
+  position: relative;
+  user-select: none;
+}
+.resizer.h { cursor: col-resize; width: 4px; }
+.resizer.v { cursor: row-resize; height: 4px; }
+.resizer:hover { background: var(--accent); }
+
+.no-scroll-chrome::-webkit-scrollbar { width: 6px; height: 6px; }
+.no-scroll-chrome::-webkit-scrollbar-thumb { background: rgba(31,29,26,0.2); border-radius: 3px; }
+.no-scroll-chrome::-webkit-scrollbar-track { background: transparent; }
+
+.kbd {
+  font-family: var(--mono);
+  font-size: 11px;
+  border: 1px solid var(--rule);
+  background: var(--paper);
+  padding: 1px 5px;
+  border-radius: 3px;
+  box-shadow: 1px 1px 0 var(--rule);
+  white-space: nowrap;
+}
+
+/* CodeMirror — make it match the paper aesthetic */
+.cm-editor {
+  background: var(--paper) !important;
+  font-family: var(--mono) !important;
+  font-size: 12.5px !important;
+  height: 100%;
+}
+.cm-editor.cm-focused {
+  outline: none !important;
+}
+.cm-scroller { font-family: var(--mono) !important; line-height: 1.7 !important; }
+.cm-gutters {
+  background: var(--paper) !important;
+  border-right: 1px dashed rgba(31,29,26,0.18) !important;
+  color: var(--ink-faint) !important;
+}
+.cm-activeLine { background: rgba(31,29,26,0.04) !important; }
+.cm-activeLineGutter { background: transparent !important; color: var(--ink) !important; }
+.cm-cursor { border-left-color: var(--ink) !important; }
+.cm-selectionBackground { background: var(--accent-soft) !important; }
+
+/* xterm — paper terminal */
+.xterm {
+  font-family: var(--mono) !important;
+  font-size: 12px;
+  padding: 8px 12px;
+  background: var(--paper);
+}
+.xterm-viewport, .xterm-screen { background: var(--paper) !important; }
+.xterm-cursor-layer { z-index: 4; }
+
+/* drag overlay */
+.split-zones {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  pointer-events: none;
+  z-index: 25;
+}
+.split-zones > div {
+  pointer-events: auto;
+  border: 2px dashed transparent;
+}
+.split-zones > div.hover {
+  border-color: var(--accent);
+  background: rgba(255,165,80,0.1);
+}
+
+/* macOS overlay traffic light area — keep clear */
+.mac-traffic-pad {
+  width: 76px;
+  height: 28px;
+  flex-shrink: 0;
+}
