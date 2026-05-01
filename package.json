@@ -1,8 +1,8 @@
 {
-  "name": "clauna",
+  "name": "clana",
   "version": "0.1.0",
   "private": true,
-  "description": "Clauna — minimalist vibe-coding IDE",
+  "description": "Clana — minimalist vibe-coding IDE",
   "type": "module",
   "scripts": {
     "dev": "vite",

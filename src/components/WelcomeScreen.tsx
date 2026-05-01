@@ -36,7 +36,7 @@ export function WelcomeScreen() {
           className="hand-title"
           style={{ fontSize: 30, marginBottom: 4, color: "var(--ink)" }}
         >
-          Welcome to Clauna
+          Welcome to Clana
         </div>
         <div
           className="hand-label"

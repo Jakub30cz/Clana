@@ -13,7 +13,7 @@ interface Props {
   pane: PaneLeaf;
 }
 
-const SAMPLE_README = `# Clauna
+const SAMPLE_README = `# Clana
 
 a tiny vibe-coding ide.
 files, splits, terminal, claude — at a keystroke.

@@ -188,7 +188,7 @@ export const useStore = create<State>()(
       },
     }),
     {
-      name: "clauna-ui",
+      name: "clana-ui",
       partialize: (s): PersistedSlice => ({
         layout: s.layout,
         accent: s.accent,

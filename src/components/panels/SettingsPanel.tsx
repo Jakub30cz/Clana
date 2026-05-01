@@ -154,7 +154,7 @@ export function SettingsPanel() {
 
       <Group label="About">
         <div style={{ fontSize: 12, color: "var(--ink-soft)", lineHeight: 1.5 }}>
-          Clauna v0.1.0 — minimalist vibe-coding IDE.<br />
+          Clana v0.1.0 — minimalist vibe-coding IDE.<br />
           Tauri 2 · React 18 · CodeMirror 6 · xterm.js
         </div>
       </Group>

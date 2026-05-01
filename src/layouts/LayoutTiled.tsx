@@ -1,6 +1,5 @@
 import { Sidebar } from "@/components/Sidebar";
 import { PaneShell } from "@/components/panes/PaneShell";
-import { SplitPaletteFAB } from "@/components/SplitPaletteFAB";
 import { useStore } from "@/state/store";
 
 export function LayoutTiled() {
@@ -13,7 +12,6 @@ export function LayoutTiled() {
           <PaneShell pane={tree} />
         </div>
       </div>
-      <SplitPaletteFAB />
     </div>
   );
 }

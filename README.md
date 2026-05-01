@@ -1,4 +1,4 @@
-# Clauna
+# Clana
 
 > A minimalist vibe-coding IDE — file tree, splits, integrated terminal, and Claude Code at one keystroke.
 

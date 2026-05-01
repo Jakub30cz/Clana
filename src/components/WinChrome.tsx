@@ -1,6 +1,7 @@
 import { ReactNode } from "react";
 import { LayoutSwitcher } from "./LayoutSwitcher";
 import { WorkspacePicker } from "./WorkspacePicker";
+import { PaneToolbar } from "./PaneToolbar";
 import { useStore } from "@/state/store";
 
 interface Props {
@@ -9,7 +10,7 @@ interface Props {
   children: ReactNode;
 }
 
-export function WinChrome({ title = "clauna", subtitle, children }: Props) {
+export function WinChrome({ title = "clana", subtitle, children }: Props) {
   const layout = useStore((s) => s.layout);
   const sub = subtitle ?? layoutSubtitle(layout);
 
@@ -46,6 +47,7 @@ export function WinChrome({ title = "clauna", subtitle, children }: Props) {
           <span style={{ fontWeight: 600, color: "var(--ink)" }}>{title}</span>
           {sub && <span style={{ opacity: 0.7 }}> — {sub}</span>}
         </div>
+        <PaneToolbar />
         <LayoutSwitcher />
       </div>
       <div style={{ flex: 1, minHeight: 0, display: "flex", flexDirection: "column", position: "relative" }}>
