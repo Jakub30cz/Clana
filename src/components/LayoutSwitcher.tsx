@@ -3,7 +3,7 @@ import { Glyph } from "@/lib/glyphs";
 import { useStore } from "@/state/store";
 import { LAYOUT_LABELS, LayoutMode } from "@/state/layouts";
 
-const LAYOUTS: LayoutMode[] = ["classic", "zen", "tiled", "claude-dock"];
+const LAYOUTS: LayoutMode[] = ["classic", "zen", "tiled"];
 
 export function LayoutSwitcher() {
   const layout = useStore((s) => s.layout);
@@ -76,7 +76,5 @@ function shortName(m: LayoutMode): string {
       return "Zen";
     case "tiled":
       return "Tiled";
-    case "claude-dock":
-      return "Claude dock";
   }
 }

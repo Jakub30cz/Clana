@@ -65,8 +65,6 @@ function layoutSubtitle(layout: string): string {
       return "zen mode";
     case "tiled":
       return "tiled · 4 panes";
-    case "claude-dock":
-      return "claude-first";
     default:
       return "";
   }

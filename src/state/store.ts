@@ -15,7 +15,7 @@ import {
 } from "@/lib/paneTree";
 import { initialTreeFor, LayoutMode } from "@/state/layouts";
 
-export type AccentName = "amber" | "teal" | "rose" | "green" | "violet";
+export type AccentName = "blue" | "amber" | "teal" | "rose" | "green" | "violet";
 export type SidePanel = "files" | "git" | "search" | "settings" | null;
 export type ThemeName = "sketch" | "clean" | "mono" | "serif";
 export type ColorMode = "light" | "dark" | "auto";
@@ -95,9 +95,9 @@ export const useStore = create<State>()(
       activePaneId: firstLeaf(initialTree).id,
       openFiles: {},
       layout: initialLayout,
-      accent: "amber",
-      theme: "sketch",
-      mode: "light",
+      accent: "blue",
+      theme: "clean",
+      mode: "dark",
       workdir: "",
       sidePanel: "files",
       recentWorkspaces: [],
@@ -210,6 +210,7 @@ function basenameOf(p: string): string {
 }
 
 export const ACCENTS: Record<AccentName, string> = {
+  blue: "oklch(0.62 0.18 250)",
   amber: "oklch(0.68 0.16 50)",
   teal: "oklch(0.65 0.13 200)",
   rose: "oklch(0.65 0.16 20)",
@@ -217,10 +218,20 @@ export const ACCENTS: Record<AccentName, string> = {
   violet: "oklch(0.62 0.16 290)",
 };
 
-export const ACCENT_SOFT: Record<AccentName, string> = {
+export const ACCENT_SOFT_LIGHT: Record<AccentName, string> = {
+  blue: "oklch(0.93 0.05 250)",
   amber: "oklch(0.92 0.05 60)",
   teal: "oklch(0.92 0.04 200)",
   rose: "oklch(0.92 0.05 20)",
   green: "oklch(0.93 0.05 145)",
   violet: "oklch(0.93 0.05 290)",
+};
+
+export const ACCENT_SOFT_DARK: Record<AccentName, string> = {
+  blue: "oklch(0.30 0.07 250)",
+  amber: "oklch(0.30 0.07 60)",
+  teal: "oklch(0.30 0.06 200)",
+  rose: "oklch(0.30 0.07 20)",
+  green: "oklch(0.30 0.06 145)",
+  violet: "oklch(0.30 0.07 290)",
 };

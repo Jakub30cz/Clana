@@ -6,9 +6,9 @@ import { WelcomeScreen } from "@/components/WelcomeScreen";
 import { LayoutClassic } from "@/layouts/LayoutClassic";
 import { LayoutZen } from "@/layouts/LayoutZen";
 import { LayoutTiled } from "@/layouts/LayoutTiled";
-import { LayoutClaudeDock } from "@/layouts/LayoutClaudeDock";
-import { ACCENTS, ACCENT_SOFT, useStore } from "@/state/store";
+import { ACCENTS, ACCENT_SOFT_DARK, ACCENT_SOFT_LIGHT, useStore } from "@/state/store";
 import { useGlobalKeymap } from "@/lib/keymap";
+import { useMenuEvents } from "@/lib/menuEvents";
 
 export default function App() {
   const layout = useStore((s) => s.layout);
@@ -18,6 +18,7 @@ export default function App() {
   const workdir = useStore((s) => s.workdir);
 
   useGlobalKeymap();
+  useMenuEvents();
 
   // Apply theme + mode on document root.
   useEffect(() => {
@@ -25,11 +26,26 @@ export default function App() {
     document.documentElement.dataset.mode = mode;
   }, [theme, mode]);
 
-  // Accent override (independent of theme).
+  // Accent override (independent of theme), mode-aware soft pair.
   useEffect(() => {
-    document.documentElement.style.setProperty("--accent", ACCENTS[accent]);
-    document.documentElement.style.setProperty("--accent-soft", ACCENT_SOFT[accent]);
-  }, [accent]);
+    const update = () => {
+      const sysDark =
+        typeof window !== "undefined" &&
+        window.matchMedia("(prefers-color-scheme: dark)").matches;
+      const isDark = mode === "dark" || (mode === "auto" && sysDark);
+      document.documentElement.style.setProperty("--accent", ACCENTS[accent]);
+      document.documentElement.style.setProperty(
+        "--accent-soft",
+        (isDark ? ACCENT_SOFT_DARK : ACCENT_SOFT_LIGHT)[accent]
+      );
+    };
+    update();
+    if (mode === "auto") {
+      const mq = window.matchMedia("(prefers-color-scheme: dark)");
+      mq.addEventListener("change", update);
+      return () => mq.removeEventListener("change", update);
+    }
+  }, [accent, mode]);
 
   return (
     <WinChrome>
@@ -41,7 +57,6 @@ export default function App() {
           {layout === "classic" && <LayoutClassic />}
           {layout === "zen" && <LayoutZen />}
           {layout === "tiled" && <LayoutTiled />}
-          {layout === "claude-dock" && <LayoutClaudeDock />}
         </>
       )}
       <StatusBar />

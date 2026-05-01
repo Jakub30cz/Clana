@@ -94,12 +94,6 @@ export function CommandPalette() {
         kbd: "⌘3",
         run: () => setLayout("tiled"),
       },
-      {
-        icon: "layers",
-        label: "Layout: Claude dock",
-        kbd: "⌘4",
-        run: () => setLayout("claude-dock"),
-      },
     ];
   }, [splitPane, setLayout, setSidePanel, closePane]);
 

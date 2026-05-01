@@ -59,14 +59,13 @@ export function useGlobalKeymap() {
         return;
       }
 
-      // ⌘1-4 — switch layout
-      if (mod(e) && ["1", "2", "3", "4"].includes(e.key)) {
+      // ⌘1-3 — switch layout
+      if (mod(e) && ["1", "2", "3"].includes(e.key)) {
         e.preventDefault();
         const map: Record<string, LayoutMode> = {
           "1": "classic",
           "2": "zen",
           "3": "tiled",
-          "4": "claude-dock",
         };
         s.setLayout(map[e.key]);
         return;

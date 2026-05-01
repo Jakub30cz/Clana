@@ -1,7 +1,7 @@
 import clsx from "clsx";
 import { ACCENTS, AccentName, ColorMode, ThemeName, useStore } from "@/state/store";
 
-const ACCENT_NAMES: AccentName[] = ["amber", "teal", "rose", "green", "violet"];
+const ACCENT_NAMES: AccentName[] = ["blue", "amber", "teal", "rose", "green", "violet"];
 
 interface ThemeMeta {
   id: ThemeName;

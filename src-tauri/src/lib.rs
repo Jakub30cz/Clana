@@ -1,5 +1,6 @@
 mod fs_cmds;
 mod git_cmds;
+mod menu;
 mod pty_cmds;
 mod search_cmds;
 
@@ -8,6 +9,7 @@ use tauri::Manager;
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     let pty_state = pty_cmds::PtyState::default();
+    let menu_recent = menu::MenuRecent::default();
 
     tauri::Builder::default()
         .plugin(tauri_plugin_fs::init())
@@ -15,6 +17,9 @@ pub fn run() {
         .plugin(tauri_plugin_shell::init())
         .plugin(tauri_plugin_os::init())
         .manage(pty_state)
+        .manage(menu_recent)
+        .menu(|app| menu::build(app, &[]))
+        .on_menu_event(|app, event| menu::handle_event(app, event))
         .setup(|app| {
             #[cfg(target_os = "macos")]
             {
@@ -38,6 +43,7 @@ pub fn run() {
             pty_cmds::pty_resize,
             pty_cmds::pty_kill,
             search_cmds::search_workspace,
+            menu::update_recent_menu,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
