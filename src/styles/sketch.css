@@ -1,6 +1,10 @@
-/* Sketchy IDE wireframe styles — ported from the design prototype */
+/* Structural styles. All visual parameters live in CSS variables defined per
+   theme in themes.css — this file shouldn't hard-code colors, fonts, or
+   decorations. Defaults below match the Sketch / light theme so the file is
+   usable on its own. */
 
 :root {
+  /* palette */
   --paper: #f7f3ea;
   --paper-2: #efe9da;
   --ink: #1f1d1a;
@@ -10,9 +14,36 @@
   --accent: oklch(0.68 0.16 50);
   --accent-soft: oklch(0.92 0.05 60);
   --accent-2: oklch(0.72 0.13 200);
-  --hand: 'Kalam', 'Caveat', cursive;
-  --display: 'Caveat', cursive;
-  --mono: 'JetBrains Mono', ui-monospace, monospace;
+  --decor-rgb: 31, 29, 26;
+
+  /* typography */
+  --font-hand: 'Kalam', 'Caveat', cursive;
+  --font-display: 'Caveat', cursive;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+  --font-ui: var(--font-hand);
+
+  /* legacy aliases used in inline styles */
+  --hand: var(--font-hand);
+  --display: var(--font-display);
+  --mono: var(--font-mono);
+
+  /* decorations */
+  --frame-radius: 6px;
+  --frame-border-w: 2px;
+  --frame-border-w-thin: 1.5px;
+  --frame-shadow: 2px 2px 0 var(--rule);
+  --frame-shadow-thin: 1.5px 1.5px 0 var(--rule);
+  --tab-rotate-inactive: -0.4deg;
+  --tab-rotate-active: 0.2deg;
+  --btn-rotate: -0.3deg;
+  --btn-shadow: 1.5px 1.5px 0 var(--rule);
+  --btn-radius: 5px;
+  --kbd-shadow: 1px 1px 0 var(--rule);
+  --kbd-radius: 3px;
+  --act-icon-shadow: 1.5px 1.5px 0 var(--rule);
+  --bg-base: radial-gradient(ellipse at top, #e3dcc7, #d2c9b1);
+  --bg-fallback: #ddd6c5;
+  --decor-squiggle-color: %231f1d1a;
 }
 
 * { box-sizing: border-box; }
@@ -21,40 +52,33 @@ html, body, #root {
   margin: 0;
   padding: 0;
   height: 100%;
-  background: #ddd6c5;
-  font-family: var(--hand);
+  background: var(--bg-fallback);
+  font-family: var(--font-ui);
   color: var(--ink);
   overflow: hidden;
 }
 
 body {
-  background-image: radial-gradient(ellipse at top, #e3dcc7, #d2c9b1);
+  background-image: var(--bg-base);
 }
 
-button {
-  font-family: inherit;
-  color: inherit;
-}
-
-input, textarea {
-  font-family: inherit;
-  color: inherit;
-}
+button { font-family: inherit; color: inherit; }
+input, textarea { font-family: inherit; color: inherit; }
 
 /* ─── Sketchy primitives ─── */
 
 .sketch-frame {
   position: relative;
   background: var(--paper);
-  border: 2px solid var(--rule);
-  border-radius: 6px;
-  box-shadow: 2px 2px 0 var(--rule);
+  border: var(--frame-border-w) solid var(--rule);
+  border-radius: var(--frame-radius);
+  box-shadow: var(--frame-shadow);
 }
 
 .sketch-frame.dashed { border-style: dashed; }
 .sketch-frame.thin {
-  border-width: 1.5px;
-  box-shadow: 1.5px 1.5px 0 var(--rule);
+  border-width: var(--frame-border-w-thin);
+  box-shadow: var(--frame-shadow-thin);
 }
 
 .scribble-underline { position: relative; display: inline-block; }
@@ -68,24 +92,24 @@ input, textarea {
   border-radius: 50%;
 }
 
-.hand-label { font-family: var(--hand); font-weight: 400; letter-spacing: 0.2px; }
-.hand-title { font-family: var(--display); font-weight: 600; letter-spacing: 0.3px; }
+.hand-label { font-family: var(--font-hand); font-weight: 400; letter-spacing: 0.2px; }
+.hand-title { font-family: var(--font-display); font-weight: 600; letter-spacing: 0.3px; }
 
 .hatch {
-  background-image: repeating-linear-gradient(-45deg, transparent 0 6px, rgba(31,29,26,0.07) 6px 7px);
+  background-image: repeating-linear-gradient(-45deg, transparent 0 6px, rgb(var(--decor-rgb) / 0.07) 6px 7px);
 }
 .hatch-strong {
-  background-image: repeating-linear-gradient(-45deg, transparent 0 5px, rgba(31,29,26,0.13) 5px 6.5px);
+  background-image: repeating-linear-gradient(-45deg, transparent 0 5px, rgb(var(--decor-rgb) / 0.13) 5px 6.5px);
 }
 .dot-grid {
-  background-image: radial-gradient(rgba(31,29,26,0.18) 1px, transparent 1.2px);
+  background-image: radial-gradient(rgb(var(--decor-rgb) / 0.18) 1px, transparent 1.2px);
   background-size: 14px 14px;
 }
 .paper-noise {
   background-color: var(--paper);
   background-image:
-    radial-gradient(rgba(0,0,0,0.025) 1px, transparent 1px),
-    radial-gradient(rgba(0,0,0,0.02) 1px, transparent 1px);
+    radial-gradient(rgb(var(--decor-rgb) / 0.025) 1px, transparent 1px),
+    radial-gradient(rgb(var(--decor-rgb) / 0.02) 1px, transparent 1px);
   background-size: 3px 3px, 7px 7px;
   background-position: 0 0, 1px 2px;
 }
@@ -93,37 +117,38 @@ input, textarea {
 .squiggle {
   width: 100%;
   height: 8px;
-  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 80 8' preserveAspectRatio='none'><path d='M0 4 Q 5 0, 10 4 T 20 4 T 30 4 T 40 4 T 50 4 T 60 4 T 70 4 T 80 4' fill='none' stroke='%231f1d1a' stroke-width='1.2'/></svg>");
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 80 8' preserveAspectRatio='none'><path d='M0 4 Q 5 0, 10 4 T 20 4 T 30 4 T 40 4 T 50 4 T 60 4 T 70 4 T 80 4' fill='none' stroke='currentColor' stroke-width='1.2'/></svg>");
   background-repeat: repeat-x;
   background-size: 80px 8px;
+  color: var(--ink);
 }
 
 /* tab shape */
 .sketch-tab {
   position: relative;
   padding: 6px 14px 6px 12px;
-  border: 1.5px solid var(--rule);
+  border: var(--frame-border-w-thin) solid var(--rule);
   border-bottom: none;
-  border-radius: 6px 8px 0 0;
+  border-radius: var(--frame-radius) calc(var(--frame-radius) + 2px) 0 0;
   background: var(--paper-2);
-  font-family: var(--hand);
+  font-family: var(--font-hand);
   font-size: 13px;
   display: inline-flex;
   align-items: center;
   gap: 8px;
   cursor: pointer;
-  transform: rotate(-0.4deg);
+  transform: rotate(var(--tab-rotate-inactive));
   white-space: nowrap;
 }
 .sketch-tab.active {
   background: var(--paper);
   font-weight: 700;
-  transform: rotate(0.2deg);
+  transform: rotate(var(--tab-rotate-active));
   box-shadow: 0 -2px 0 var(--accent) inset;
 }
 .sketch-tab .x {
   opacity: 0.45;
-  font-family: var(--mono);
+  font-family: var(--font-mono);
   font-size: 11px;
 }
 .sketch-tab .x:hover { opacity: 1; }
@@ -133,14 +158,14 @@ input, textarea {
   align-items: center;
   gap: 8px;
   padding: 4px 10px;
-  font-family: var(--hand);
+  font-family: var(--font-hand);
   font-size: 14px;
   color: var(--ink);
   cursor: pointer;
   border-radius: 3px;
   white-space: nowrap;
 }
-.side-item:hover { background: rgba(31,29,26,0.06); }
+.side-item:hover { background: rgb(var(--decor-rgb) / 0.06); }
 .side-item.active {
   background: var(--accent-soft);
   font-weight: 700;
@@ -158,19 +183,19 @@ input, textarea {
   height: 36px;
   display: grid;
   place-items: center;
-  border: 1.5px solid transparent;
-  border-radius: 6px;
+  border: var(--frame-border-w-thin) solid transparent;
+  border-radius: var(--frame-radius);
   cursor: pointer;
   color: var(--ink-soft);
   position: relative;
   background: transparent;
 }
-.act-icon:hover { background: rgba(31,29,26,0.05); }
+.act-icon:hover { background: rgb(var(--decor-rgb) / 0.05); }
 .act-icon.active {
   border-color: var(--rule);
   background: var(--paper);
   color: var(--ink);
-  box-shadow: 1.5px 1.5px 0 var(--rule);
+  box-shadow: var(--act-icon-shadow);
 }
 .act-icon.active::before {
   content: "";
@@ -183,29 +208,30 @@ input, textarea {
 }
 
 .sketch-btn {
-  font-family: var(--hand);
+  font-family: var(--font-hand);
   font-size: 13px;
   padding: 4px 10px;
-  border: 1.5px solid var(--rule);
-  border-radius: 5px;
+  border: var(--frame-border-w-thin) solid var(--rule);
+  border-radius: var(--btn-radius);
   background: var(--paper);
   cursor: pointer;
-  box-shadow: 1.5px 1.5px 0 var(--rule);
-  transform: rotate(-0.3deg);
+  box-shadow: var(--btn-shadow);
+  transform: rotate(var(--btn-rotate));
   user-select: none;
+  color: var(--ink);
 }
 .sketch-btn:hover { background: var(--accent-soft); }
 .sketch-btn:active {
-  transform: translate(1px, 1px) rotate(-0.3deg);
+  transform: translate(1px, 1px) rotate(var(--btn-rotate));
   box-shadow: 0 0 0 var(--rule);
 }
 .sketch-btn.primary {
   background: var(--accent);
-  color: #1f1d1a;
+  color: var(--ink);
 }
 
 .term-line {
-  font-family: var(--mono);
+  font-family: var(--font-mono);
   font-size: 12px;
   color: var(--ink);
   white-space: pre-wrap;
@@ -229,7 +255,7 @@ input, textarea {
 .palette-overlay {
   position: absolute;
   inset: 0;
-  background: rgba(31,29,26,0.18);
+  background: rgb(var(--decor-rgb) / 0.18);
   backdrop-filter: blur(2px);
   display: grid;
   place-items: start center;
@@ -242,8 +268,8 @@ input, textarea {
   inset: 0;
   pointer-events: none;
   border: 3px dashed var(--accent);
-  border-radius: 6px;
-  background: rgba(255, 165, 80, 0.08);
+  border-radius: var(--frame-radius);
+  background: rgb(var(--decor-rgb) / 0.08);
   z-index: 5;
 }
 
@@ -252,15 +278,15 @@ input, textarea {
   align-items: center;
   gap: 14px;
   padding: 4px 12px;
-  border-top: 1.5px solid var(--rule);
+  border-top: var(--frame-border-w-thin) solid var(--rule);
   background: var(--paper-2);
-  font-family: var(--mono);
+  font-family: var(--font-mono);
   font-size: 11px;
   color: var(--ink-soft);
 }
 
 .resizer {
-  background: rgba(31,29,26,0.15);
+  background: rgb(var(--decor-rgb) / 0.15);
   position: relative;
   user-select: none;
 }
@@ -269,44 +295,44 @@ input, textarea {
 .resizer:hover { background: var(--accent); }
 
 .no-scroll-chrome::-webkit-scrollbar { width: 6px; height: 6px; }
-.no-scroll-chrome::-webkit-scrollbar-thumb { background: rgba(31,29,26,0.2); border-radius: 3px; }
+.no-scroll-chrome::-webkit-scrollbar-thumb { background: rgb(var(--decor-rgb) / 0.2); border-radius: 3px; }
 .no-scroll-chrome::-webkit-scrollbar-track { background: transparent; }
 
 .kbd {
-  font-family: var(--mono);
+  font-family: var(--font-mono);
   font-size: 11px;
   border: 1px solid var(--rule);
   background: var(--paper);
   padding: 1px 5px;
-  border-radius: 3px;
-  box-shadow: 1px 1px 0 var(--rule);
+  border-radius: var(--kbd-radius);
+  box-shadow: var(--kbd-shadow);
   white-space: nowrap;
 }
 
-/* CodeMirror — make it match the paper aesthetic */
+/* CodeMirror — match the active theme */
 .cm-editor {
   background: var(--paper) !important;
-  font-family: var(--mono) !important;
+  font-family: var(--font-mono) !important;
   font-size: 12.5px !important;
   height: 100%;
+  color: var(--ink) !important;
 }
-.cm-editor.cm-focused {
-  outline: none !important;
-}
-.cm-scroller { font-family: var(--mono) !important; line-height: 1.7 !important; }
+.cm-editor.cm-focused { outline: none !important; }
+.cm-scroller { font-family: var(--font-mono) !important; line-height: 1.7 !important; }
 .cm-gutters {
   background: var(--paper) !important;
-  border-right: 1px dashed rgba(31,29,26,0.18) !important;
+  border-right: 1px dashed rgb(var(--decor-rgb) / 0.18) !important;
   color: var(--ink-faint) !important;
 }
-.cm-activeLine { background: rgba(31,29,26,0.04) !important; }
+.cm-activeLine { background: rgb(var(--decor-rgb) / 0.04) !important; }
 .cm-activeLineGutter { background: transparent !important; color: var(--ink) !important; }
 .cm-cursor { border-left-color: var(--ink) !important; }
 .cm-selectionBackground { background: var(--accent-soft) !important; }
+.cm-content { caret-color: var(--ink) !important; }
 
 /* xterm — paper terminal */
 .xterm {
-  font-family: var(--mono) !important;
+  font-family: var(--font-mono) !important;
   font-size: 12px;
   padding: 8px 12px;
   background: var(--paper);
@@ -314,7 +340,6 @@ input, textarea {
 .xterm-viewport, .xterm-screen { background: var(--paper) !important; }
 .xterm-cursor-layer { z-index: 4; }
 
-/* drag overlay */
 .split-zones {
   position: absolute;
   inset: 0;
@@ -330,10 +355,9 @@ input, textarea {
 }
 .split-zones > div.hover {
   border-color: var(--accent);
-  background: rgba(255,165,80,0.1);
+  background: rgb(var(--decor-rgb) / 0.1);
 }
 
-/* macOS overlay traffic light area — keep clear */
 .mac-traffic-pad {
   width: 76px;
   height: 28px;

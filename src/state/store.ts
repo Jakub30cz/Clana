@@ -17,6 +17,8 @@ import { initialTreeFor, LayoutMode } from "@/state/layouts";
 
 export type AccentName = "amber" | "teal" | "rose" | "green" | "violet";
 export type SidePanel = "files" | "git" | "search" | "settings" | null;
+export type ThemeName = "sketch" | "clean" | "mono" | "serif";
+export type ColorMode = "light" | "dark" | "auto";
 
 interface OpenFile {
   path: string;
@@ -28,6 +30,8 @@ interface OpenFile {
 interface PersistedSlice {
   layout: LayoutMode;
   accent: AccentName;
+  theme: ThemeName;
+  mode: ColorMode;
   workdir: string;
   sidePanel: SidePanel;
 }
@@ -54,6 +58,8 @@ interface State extends PersistedSlice {
   // ui
   setLayout: (m: LayoutMode) => void;
   setAccent: (a: AccentName) => void;
+  setTheme: (t: ThemeName) => void;
+  setMode: (m: ColorMode) => void;
   setSidePanel: (p: SidePanel) => void;
   setPaletteOpen: (b: boolean) => void;
   setLayoutMenuOpen: (b: boolean) => void;
@@ -74,6 +80,8 @@ export const useStore = create<State>()(
       openFiles: {},
       layout: initialLayout,
       accent: "amber",
+      theme: "sketch",
+      mode: "light",
       workdir: "",
       sidePanel: "files",
       paletteOpen: false,
@@ -134,6 +142,8 @@ export const useStore = create<State>()(
           return { layout: m, tree, activePaneId: firstLeaf(tree).id };
         }),
       setAccent: (a) => set({ accent: a }),
+      setTheme: (t) => set({ theme: t }),
+      setMode: (m) => set({ mode: m }),
       setSidePanel: (p) => set({ sidePanel: p }),
       setPaletteOpen: (b) => set({ paletteOpen: b }),
       setLayoutMenuOpen: (b) => set({ layoutMenuOpen: b }),
@@ -149,6 +159,8 @@ export const useStore = create<State>()(
       partialize: (s): PersistedSlice => ({
         layout: s.layout,
         accent: s.accent,
+        theme: s.theme,
+        mode: s.mode,
         workdir: s.workdir,
         sidePanel: s.sidePanel,
       }),

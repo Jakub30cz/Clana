@@ -13,11 +13,24 @@ import { safeIpc } from "@/lib/ipc";
 export default function App() {
   const layout = useStore((s) => s.layout);
   const accent = useStore((s) => s.accent);
+  const theme = useStore((s) => s.theme);
+  const mode = useStore((s) => s.mode);
   const workdir = useStore((s) => s.workdir);
   const setWorkdir = useStore((s) => s.setWorkdir);
 
   useGlobalKeymap();
 
+  // Apply theme + mode on document root.
+  useEffect(() => {
+    document.documentElement.dataset.theme = theme;
+    if (mode === "auto") {
+      document.documentElement.dataset.mode = "auto";
+    } else {
+      document.documentElement.dataset.mode = mode;
+    }
+  }, [theme, mode]);
+
+  // Accent override (independent of theme).
   useEffect(() => {
     document.documentElement.style.setProperty("--accent", ACCENTS[accent]);
     document.documentElement.style.setProperty("--accent-soft", ACCENT_SOFT[accent]);

@@ -1,0 +1,248 @@
+/* Theme catalog — every theme overrides the variables defined in sketch.css.
+   Combine [data-theme] + [data-mode] for the 8 light/dark variants.
+
+   Default (no [data-theme] attr) = sketch / light, defined in sketch.css. */
+
+/* ─────────────────────────────────────────────────────────
+   1. SKETCH — handwritten paper, the original look
+   ───────────────────────────────────────────────────────── */
+[data-theme="sketch"] {
+  --paper: #f7f3ea;
+  --paper-2: #efe9da;
+  --ink: #1f1d1a;
+  --ink-soft: #4a463f;
+  --ink-faint: #8a857a;
+  --rule: #2a2722;
+  --accent: oklch(0.68 0.16 50);
+  --accent-soft: oklch(0.92 0.05 60);
+  --accent-2: oklch(0.72 0.13 200);
+  --decor-rgb: 31, 29, 26;
+  --font-hand: 'Kalam', 'Caveat', cursive;
+  --font-display: 'Caveat', cursive;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+  --bg-base: radial-gradient(ellipse at top, #e3dcc7, #d2c9b1);
+  --bg-fallback: #ddd6c5;
+}
+
+[data-theme="sketch"][data-mode="dark"] {
+  --paper: #1c1a16;
+  --paper-2: #25221c;
+  --ink: #ece5d2;
+  --ink-soft: #b7af9d;
+  --ink-faint: #706a5e;
+  --rule: #46413a;
+  --accent: oklch(0.78 0.16 55);
+  --accent-soft: oklch(0.32 0.07 55);
+  --accent-2: oklch(0.72 0.13 200);
+  --decor-rgb: 236, 229, 210;
+  --bg-base: radial-gradient(ellipse at top, #221f19, #15130f);
+  --bg-fallback: #15130f;
+}
+
+/* ─────────────────────────────────────────────────────────
+   2. CLEAN — modern minimalist, Inter, no decorations
+   ───────────────────────────────────────────────────────── */
+[data-theme="clean"] {
+  --paper: #ffffff;
+  --paper-2: #f7f7f7;
+  --ink: #0f0f10;
+  --ink-soft: #525258;
+  --ink-faint: #a5a5ac;
+  --rule: #e5e5ea;
+  --accent: #f97316;
+  --accent-soft: #fff4ec;
+  --accent-2: #2563eb;
+  --decor-rgb: 15, 15, 16;
+  --font-hand: 'Inter', -apple-system, system-ui, sans-serif;
+  --font-display: 'Inter', -apple-system, system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+  --bg-base: #ffffff;
+  --bg-fallback: #ffffff;
+
+  --frame-radius: 10px;
+  --frame-border-w: 1px;
+  --frame-border-w-thin: 1px;
+  --frame-shadow: none;
+  --frame-shadow-thin: none;
+  --tab-rotate-inactive: 0deg;
+  --tab-rotate-active: 0deg;
+  --btn-rotate: 0deg;
+  --btn-shadow: none;
+  --btn-radius: 8px;
+  --kbd-shadow: none;
+  --kbd-radius: 4px;
+  --act-icon-shadow: none;
+}
+
+[data-theme="clean"][data-mode="dark"] {
+  --paper: #0c0c0e;
+  --paper-2: #16161a;
+  --ink: #f5f5f7;
+  --ink-soft: #a3a3aa;
+  --ink-faint: #57575c;
+  --rule: #2a2a30;
+  --accent: #fb923c;
+  --accent-soft: #2a1d10;
+  --accent-2: #60a5fa;
+  --decor-rgb: 245, 245, 247;
+  --bg-base: #0c0c0e;
+  --bg-fallback: #0c0c0e;
+}
+
+/* ─────────────────────────────────────────────────────────
+   3. MONO — JetBrains Mono everywhere, brutalist grid
+   ───────────────────────────────────────────────────────── */
+[data-theme="mono"] {
+  --paper: #ffffff;
+  --paper-2: #f4f4f4;
+  --ink: #000000;
+  --ink-soft: #404040;
+  --ink-faint: #909090;
+  --rule: #000000;
+  --accent: #ff5500;
+  --accent-soft: #ffe6d6;
+  --accent-2: #0066ff;
+  --decor-rgb: 0, 0, 0;
+  --font-hand: 'IBM Plex Mono', 'JetBrains Mono', ui-monospace, monospace;
+  --font-display: 'IBM Plex Mono', 'JetBrains Mono', ui-monospace, monospace;
+  --font-mono: 'IBM Plex Mono', 'JetBrains Mono', ui-monospace, monospace;
+  --bg-base: #ffffff;
+  --bg-fallback: #ffffff;
+
+  --frame-radius: 0;
+  --frame-border-w: 2px;
+  --frame-border-w-thin: 1.5px;
+  --frame-shadow: 3px 3px 0 var(--rule);
+  --frame-shadow-thin: 2px 2px 0 var(--rule);
+  --tab-rotate-inactive: 0deg;
+  --tab-rotate-active: 0deg;
+  --btn-rotate: 0deg;
+  --btn-shadow: 2px 2px 0 var(--rule);
+  --btn-radius: 0;
+  --kbd-shadow: 1.5px 1.5px 0 var(--rule);
+  --kbd-radius: 0;
+  --act-icon-shadow: 2px 2px 0 var(--rule);
+}
+
+[data-theme="mono"][data-mode="dark"] {
+  --paper: #0a0a0a;
+  --paper-2: #141414;
+  --ink: #ffffff;
+  --ink-soft: #c8c8c8;
+  --ink-faint: #6a6a6a;
+  --rule: #ffffff;
+  --accent: #ff7d33;
+  --accent-soft: #2a1408;
+  --accent-2: #66a3ff;
+  --decor-rgb: 255, 255, 255;
+  --bg-base: #0a0a0a;
+  --bg-fallback: #0a0a0a;
+}
+
+/* ─────────────────────────────────────────────────────────
+   4. SERIF — Lora, book-like, warm
+   ───────────────────────────────────────────────────────── */
+[data-theme="serif"] {
+  --paper: #fbf8f1;
+  --paper-2: #f3eddf;
+  --ink: #2a2520;
+  --ink-soft: #5b5249;
+  --ink-faint: #978e83;
+  --rule: #d4ccbf;
+  --accent: #b45309;
+  --accent-soft: #fbeede;
+  --accent-2: #1e6f70;
+  --decor-rgb: 42, 37, 32;
+  --font-hand: 'Lora', 'Iowan Old Style', Georgia, serif;
+  --font-display: 'Lora', 'Iowan Old Style', Georgia, serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+  --bg-base: #f5efe1;
+  --bg-fallback: #f5efe1;
+
+  --frame-radius: 4px;
+  --frame-border-w: 1.5px;
+  --frame-border-w-thin: 1px;
+  --frame-shadow: 0 1px 0 rgb(var(--decor-rgb) / 0.2);
+  --frame-shadow-thin: none;
+  --tab-rotate-inactive: 0deg;
+  --tab-rotate-active: 0deg;
+  --btn-rotate: 0deg;
+  --btn-shadow: 0 1px 0 rgb(var(--decor-rgb) / 0.2);
+  --btn-radius: 4px;
+  --kbd-shadow: 0 1px 0 rgb(var(--decor-rgb) / 0.3);
+  --kbd-radius: 3px;
+  --act-icon-shadow: none;
+}
+
+[data-theme="serif"][data-mode="dark"] {
+  --paper: #1d1a16;
+  --paper-2: #26221c;
+  --ink: #ede4d2;
+  --ink-soft: #b8ad9b;
+  --ink-faint: #6b6357;
+  --rule: #423b32;
+  --accent: #d97706;
+  --accent-soft: #2a1d10;
+  --accent-2: #5db4b5;
+  --decor-rgb: 237, 228, 210;
+  --bg-base: #161310;
+  --bg-fallback: #161310;
+}
+
+/* ─────────────────────────────────────────────────────────
+   Auto mode: respect prefers-color-scheme when no explicit mode
+   ───────────────────────────────────────────────────────── */
+@media (prefers-color-scheme: dark) {
+  [data-mode="auto"][data-theme="sketch"] {
+    --paper: #1c1a16;
+    --paper-2: #25221c;
+    --ink: #ece5d2;
+    --ink-soft: #b7af9d;
+    --ink-faint: #706a5e;
+    --rule: #46413a;
+    --accent: oklch(0.78 0.16 55);
+    --accent-soft: oklch(0.32 0.07 55);
+    --decor-rgb: 236, 229, 210;
+    --bg-base: radial-gradient(ellipse at top, #221f19, #15130f);
+    --bg-fallback: #15130f;
+  }
+  [data-mode="auto"][data-theme="clean"] {
+    --paper: #0c0c0e;
+    --paper-2: #16161a;
+    --ink: #f5f5f7;
+    --ink-soft: #a3a3aa;
+    --ink-faint: #57575c;
+    --rule: #2a2a30;
+    --accent: #fb923c;
+    --accent-soft: #2a1d10;
+    --decor-rgb: 245, 245, 247;
+    --bg-base: #0c0c0e;
+    --bg-fallback: #0c0c0e;
+  }
+  [data-mode="auto"][data-theme="mono"] {
+    --paper: #0a0a0a;
+    --paper-2: #141414;
+    --ink: #ffffff;
+    --ink-soft: #c8c8c8;
+    --ink-faint: #6a6a6a;
+    --rule: #ffffff;
+    --accent: #ff7d33;
+    --accent-soft: #2a1408;
+    --decor-rgb: 255, 255, 255;
+    --bg-base: #0a0a0a;
+    --bg-fallback: #0a0a0a;
+  }
+  [data-mode="auto"][data-theme="serif"] {
+    --paper: #1d1a16;
+    --paper-2: #26221c;
+    --ink: #ede4d2;
+    --ink-soft: #b8ad9b;
+    --ink-faint: #6b6357;
+    --rule: #423b32;
+    --accent: #d97706;
+    --accent-soft: #2a1d10;
+    --decor-rgb: 237, 228, 210;
+    --bg-base: #161310;
+    --bg-fallback: #161310;
+  }
+}

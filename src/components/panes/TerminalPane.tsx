@@ -13,40 +13,58 @@ interface Props {
   kind: "shell" | "claude";
 }
 
+function readVar(name: string, fallback: string): string {
+  const v = getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+  return v || fallback;
+}
+
+function buildXtermTheme() {
+  const paper = readVar("--paper", "#f7f3ea");
+  const ink = readVar("--ink", "#1f1d1a");
+  const inkSoft = readVar("--ink-soft", "#4a463f");
+  const inkFaint = readVar("--ink-faint", "#8a857a");
+  const accent = readVar("--accent", "#c87a14");
+  const accent2 = readVar("--accent-2", "#3a7ec0");
+  return {
+    background: paper,
+    foreground: ink,
+    cursor: ink,
+    cursorAccent: paper,
+    black: ink,
+    red: "#c03c3c",
+    green: "#3a8a3a",
+    yellow: accent,
+    blue: accent2,
+    magenta: "#a64ea6",
+    cyan: "#2f8a8a",
+    white: inkSoft,
+    brightBlack: inkFaint,
+    brightRed: "#e05050",
+    brightGreen: "#5aa05a",
+    brightYellow: "#e09a30",
+    brightBlue: "#5a9ad6",
+    brightMagenta: "#c66ec6",
+    brightCyan: "#4eaeae",
+    brightWhite: ink,
+    selectionBackground: readVar("--accent-soft", "rgba(255,165,80,0.3)"),
+  };
+}
+
 export function TerminalPane({ pane, kind }: Props) {
   const ref = useRef<HTMLDivElement | null>(null);
   const termRef = useRef<Terminal | null>(null);
   const fitRef = useRef<FitAddon | null>(null);
   const workdir = useStore((s) => s.workdir);
+  const theme = useStore((s) => s.theme);
+  const mode = useStore((s) => s.mode);
 
   useEffect(() => {
     if (!ref.current) return;
     const term = new Terminal({
-      fontFamily: '"JetBrains Mono", ui-monospace, monospace',
+      fontFamily: 'var(--font-mono), "JetBrains Mono", ui-monospace, monospace',
       fontSize: 12,
       cursorBlink: true,
-      theme: {
-        background: "#f7f3ea",
-        foreground: "#1f1d1a",
-        cursor: "#1f1d1a",
-        black: "#1f1d1a",
-        red: "#c03c3c",
-        green: "#3a8a3a",
-        yellow: "#c87a14",
-        blue: "#3a7ec0",
-        magenta: "#a64ea6",
-        cyan: "#2f8a8a",
-        white: "#4a463f",
-        brightBlack: "#8a857a",
-        brightRed: "#e05050",
-        brightGreen: "#5aa05a",
-        brightYellow: "#e09a30",
-        brightBlue: "#5a9ad6",
-        brightMagenta: "#c66ec6",
-        brightCyan: "#4eaeae",
-        brightWhite: "#1f1d1a",
-        selectionBackground: "rgba(255,165,80,0.3)",
-      },
+      theme: buildXtermTheme(),
     });
     const fit = new FitAddon();
     term.loadAddon(fit);
@@ -111,7 +129,7 @@ export function TerminalPane({ pane, kind }: Props) {
       safeIpc(() => ipc.ptyKill(pane.id), undefined);
       term.dispose();
     };
-  }, [pane.id, kind, workdir]);
+  }, [pane.id, kind, workdir, theme, mode]);
 
   const accent = kind === "claude";
   return (
