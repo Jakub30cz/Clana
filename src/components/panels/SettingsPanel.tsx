@@ -60,6 +60,8 @@ export function SettingsPanel() {
   const setTheme = useStore((s) => s.setTheme);
   const mode = useStore((s) => s.mode);
   const setMode = useStore((s) => s.setMode);
+  const claudePrefill = useStore((s) => s.claudePrefill);
+  const setClaudePrefill = useStore((s) => s.setClaudePrefill);
 
   const previewMode: "light" | "dark" =
     mode === "auto"
@@ -126,6 +128,15 @@ export function SettingsPanel() {
         </div>
       </Group>
 
+      <Group label="Workspace">
+        <ToggleRow
+          label="Pre-fill Claude with workspace context"
+          hint="When you open a Claude pane, types &ldquo;Pracuju ve workspace …&rdquo; into the prompt. Press Enter to send."
+          value={claudePrefill}
+          onChange={setClaudePrefill}
+        />
+      </Group>
+
       <Group label="Shortcuts">
         {[
           ["Command palette", "⌘K"],
@@ -134,6 +145,7 @@ export function SettingsPanel() {
           ["Split right", "⌘ \\"],
           ["Split down", "⌘ ⇧ \\"],
           ["Close pane", "⌘W"],
+          ["Open folder", "⌘O"],
           ["Switch layout", "⌘1 / ⌘2 / ⌘3 / ⌘4"],
         ].map(([k, v]) => (
           <Row key={k} k={k} v={v} />
@@ -225,6 +237,62 @@ function Group({ label, children }: { label: string; children: React.ReactNode }
         {label}
       </div>
       {children}
+    </div>
+  );
+}
+
+function ToggleRow({
+  label,
+  hint,
+  value,
+  onChange,
+}: {
+  label: string;
+  hint?: string;
+  value: boolean;
+  onChange: (v: boolean) => void;
+}) {
+  return (
+    <div style={{ display: "flex", alignItems: "flex-start", gap: 10, padding: "4px 0" }}>
+      <button
+        onClick={() => onChange(!value)}
+        className="sketch-frame"
+        style={{
+          width: 36,
+          height: 20,
+          padding: 0,
+          background: value ? "var(--accent)" : "var(--paper-2)",
+          position: "relative",
+          cursor: "pointer",
+          borderRadius: 999,
+          flexShrink: 0,
+          marginTop: 2,
+          transform: "none",
+          boxShadow: "none",
+          border: "1.5px solid var(--rule)",
+        }}
+        title={value ? "on" : "off"}
+      >
+        <span
+          style={{
+            position: "absolute",
+            top: 1,
+            left: value ? 18 : 2,
+            width: 14,
+            height: 14,
+            borderRadius: "50%",
+            background: "var(--paper)",
+            border: "1px solid var(--rule)",
+            transition: "left .12s",
+          }}
+        />
+      </button>
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <div style={{ color: "var(--ink)" }}>{label}</div>
+        {hint && (
+          <div style={{ color: "var(--ink-faint)", fontSize: 12, lineHeight: 1.4, marginTop: 2 }}>{hint}</div>
+        )}
+      </div>
     </div>
   );
 }

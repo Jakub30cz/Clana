@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { useStore } from "@/state/store";
 import type { LayoutMode } from "@/state/layouts";
+import { openFolderDialog } from "@/lib/dialog";
 
 const isMac = typeof navigator !== "undefined" && /Mac|iPhone|iPad/.test(navigator.platform);
 
@@ -46,6 +47,15 @@ export function useGlobalKeymap() {
       if (mod(e) && e.key.toLowerCase() === "w") {
         e.preventDefault();
         s.closePane(active);
+        return;
+      }
+
+      // ⌘O — open folder
+      if (mod(e) && e.key.toLowerCase() === "o" && !e.shiftKey) {
+        e.preventDefault();
+        openFolderDialog(s.workdir || undefined).then((path) => {
+          if (path) useStore.getState().openWorkspace(path);
+        });
         return;
       }
 

@@ -54,9 +54,11 @@ export function TerminalPane({ pane, kind }: Props) {
   const ref = useRef<HTMLDivElement | null>(null);
   const termRef = useRef<Terminal | null>(null);
   const fitRef = useRef<FitAddon | null>(null);
+  const prefillTimerRef = useRef<number | null>(null);
   const workdir = useStore((s) => s.workdir);
   const theme = useStore((s) => s.theme);
   const mode = useStore((s) => s.mode);
+  const claudePrefill = useStore((s) => s.claudePrefill);
 
   useEffect(() => {
     if (!ref.current) return;
@@ -109,6 +111,17 @@ export function TerminalPane({ pane, kind }: Props) {
       term.onResize(({ cols, rows }) => {
         safeIpc(() => ipc.ptyResize(pane.id, cols, rows), undefined);
       });
+
+      // Pre-fill Claude with workspace context — typed into the prompt
+      // (no newline, so the user can hit Enter to send or backspace to drop).
+      if (kind === "claude" && claudePrefill && cwd && cwd !== ".") {
+        const name = cwd.replace(/[\\/]+$/, "").split(/[\\/]/).pop() || cwd;
+        const msg = `Pracuju ve workspace "${name}" (${cwd}). `;
+        const t = window.setTimeout(() => {
+          safeIpc(() => ipc.ptyWrite(pane.id, msg), undefined);
+        }, 1800);
+        prefillTimerRef.current = t;
+      }
     };
 
     start();
@@ -124,12 +137,16 @@ export function TerminalPane({ pane, kind }: Props) {
 
     return () => {
       ro.disconnect();
+      if (prefillTimerRef.current != null) {
+        window.clearTimeout(prefillTimerRef.current);
+        prefillTimerRef.current = null;
+      }
       unlistenData?.();
       unlistenExit?.();
       safeIpc(() => ipc.ptyKill(pane.id), undefined);
       term.dispose();
     };
-  }, [pane.id, kind, workdir, theme, mode]);
+  }, [pane.id, kind, workdir, theme, mode, claudePrefill]);
 
   const accent = kind === "claude";
   return (

@@ -20,6 +20,12 @@ export type SidePanel = "files" | "git" | "search" | "settings" | null;
 export type ThemeName = "sketch" | "clean" | "mono" | "serif";
 export type ColorMode = "light" | "dark" | "auto";
 
+export interface RecentWorkspace {
+  path: string;
+  name: string;
+  lastOpenedAt: number;
+}
+
 interface OpenFile {
   path: string;
   name: string;
@@ -34,6 +40,8 @@ interface PersistedSlice {
   mode: ColorMode;
   workdir: string;
   sidePanel: SidePanel;
+  recentWorkspaces: RecentWorkspace[];
+  claudePrefill: boolean;
 }
 
 interface State extends PersistedSlice {
@@ -42,6 +50,7 @@ interface State extends PersistedSlice {
   openFiles: Record<string, OpenFile>;
   paletteOpen: boolean;
   layoutMenuOpen: boolean;
+  workspaceMenuOpen: boolean;
 
   // pane mutations
   setTree: (tree: PaneNode) => void;
@@ -63,7 +72,14 @@ interface State extends PersistedSlice {
   setSidePanel: (p: SidePanel) => void;
   setPaletteOpen: (b: boolean) => void;
   setLayoutMenuOpen: (b: boolean) => void;
+  setWorkspaceMenuOpen: (b: boolean) => void;
   setWorkdir: (w: string) => void;
+  setClaudePrefill: (b: boolean) => void;
+
+  // workspaces
+  openWorkspace: (path: string) => void;
+  removeRecentWorkspace: (path: string) => void;
+  clearRecentWorkspaces: () => void;
 
   // helper
   getActiveLeaf: () => PaneLeaf | null;
@@ -84,8 +100,11 @@ export const useStore = create<State>()(
       mode: "light",
       workdir: "",
       sidePanel: "files",
+      recentWorkspaces: [],
+      claudePrefill: true,
       paletteOpen: false,
       layoutMenuOpen: false,
+      workspaceMenuOpen: false,
 
       setTree: (tree) => set({ tree }),
       setActivePane: (id) => set({ activePaneId: id }),
@@ -147,7 +166,21 @@ export const useStore = create<State>()(
       setSidePanel: (p) => set({ sidePanel: p }),
       setPaletteOpen: (b) => set({ paletteOpen: b }),
       setLayoutMenuOpen: (b) => set({ layoutMenuOpen: b }),
-      setWorkdir: (w) => set({ workdir: w }),
+      setWorkspaceMenuOpen: (b) => set({ workspaceMenuOpen: b }),
+      setWorkdir: (w) => set({ workdir: w, openFiles: {} }),
+      setClaudePrefill: (b) => set({ claudePrefill: b }),
+
+      openWorkspace: (path) =>
+        set((s) => {
+          const name = basenameOf(path);
+          const now = Date.now();
+          const filtered = s.recentWorkspaces.filter((r) => r.path !== path);
+          const next: RecentWorkspace[] = [{ path, name, lastOpenedAt: now }, ...filtered].slice(0, 10);
+          return { workdir: path, recentWorkspaces: next, openFiles: {} };
+        }),
+      removeRecentWorkspace: (path) =>
+        set((s) => ({ recentWorkspaces: s.recentWorkspaces.filter((r) => r.path !== path) })),
+      clearRecentWorkspaces: () => set({ recentWorkspaces: [] }),
 
       getActiveLeaf: () => {
         const { tree, activePaneId } = get();
@@ -163,10 +196,18 @@ export const useStore = create<State>()(
         mode: s.mode,
         workdir: s.workdir,
         sidePanel: s.sidePanel,
+        recentWorkspaces: s.recentWorkspaces,
+        claudePrefill: s.claudePrefill,
       }),
     }
   )
 );
+
+function basenameOf(p: string): string {
+  if (!p) return "";
+  const parts = p.replace(/[\\/]+$/, "").split(/[\\/]/);
+  return parts[parts.length - 1] || p;
+}
 
 export const ACCENTS: Record<AccentName, string> = {
   amber: "oklch(0.68 0.16 50)",

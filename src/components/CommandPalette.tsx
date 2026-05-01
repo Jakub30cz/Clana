@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Glyph, GlyphName } from "@/lib/glyphs";
 import { useStore } from "@/state/store";
+import { openFolderDialog } from "@/lib/dialog";
 
 interface Item {
   icon: GlyphName;
@@ -30,6 +31,15 @@ export function CommandPalette() {
   const items = useMemo<Item[]>(() => {
     const active = useStore.getState().activePaneId;
     return [
+      {
+        icon: "folder",
+        label: "Open folder…",
+        kbd: "⌘O",
+        run: async () => {
+          const path = await openFolderDialog(useStore.getState().workdir || undefined);
+          if (path) useStore.getState().openWorkspace(path);
+        },
+      },
       {
         icon: "sparkle",
         label: "Open Claude in new pane",

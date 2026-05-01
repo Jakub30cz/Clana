@@ -1,5 +1,6 @@
 import { ReactNode } from "react";
 import { LayoutSwitcher } from "./LayoutSwitcher";
+import { WorkspacePicker } from "./WorkspacePicker";
 import { useStore } from "@/state/store";
 
 interface Props {
@@ -35,9 +36,10 @@ export function WinChrome({ title = "clauna", subtitle, children }: Props) {
       >
         {/* macOS overlay leaves space for traffic lights via padding */}
         <div className="mac-traffic-pad" />
+        <WorkspacePicker />
         <div style={{
           flex: 1, textAlign: "center",
-          fontFamily: "var(--hand)", fontSize: 13,
+          fontFamily: "var(--font-hand)", fontSize: 13,
           color: "var(--ink-soft)",
           pointerEvents: "none",
         }}>
