@@ -11,8 +11,9 @@ import { useGlobalKeymap } from "@/lib/keymap";
 import { useMenuEvents } from "@/lib/menuEvents";
 import { useFolderDrop } from "@/lib/dragDrop";
 import { DragGhost } from "@/components/DragGhost";
-import { activeTerminalIds, disposeTerminal } from "@/lib/terminalRegistry";
+import { activeTerminalIds, disposeTerminal, refreshAllTerminalThemes } from "@/lib/terminalRegistry";
 import { listLeaves } from "@/lib/paneTree";
+import { useResolvedColorMode } from "@/lib/useResolvedColorMode";
 
 export default function App() {
   const layout = useStore((s) => s.layout);
@@ -22,6 +23,7 @@ export default function App() {
   const workdir = useStore((s) => s.workdir);
   const workspace = useStore((s) => s.workspace);
   const hasFolder = Boolean(workdir || workspace);
+  const resolvedMode = useResolvedColorMode();
 
   useGlobalKeymap();
   useMenuEvents();
@@ -44,6 +46,15 @@ export default function App() {
     document.documentElement.dataset.theme = theme;
     document.documentElement.dataset.mode = mode;
   }, [theme, mode]);
+
+  // Re-apply xterm theme on theme/mode change so existing terminals don't
+  // freeze with stale colors (especially dark text on dark background).
+  // requestAnimationFrame defers until after CSS variables flush from the
+  // dataset change above, so getComputedStyle reads the new values.
+  useEffect(() => {
+    const id = requestAnimationFrame(() => refreshAllTerminalThemes(resolvedMode));
+    return () => cancelAnimationFrame(id);
+  }, [theme, resolvedMode]);
 
   // Accent override (independent of theme), mode-aware soft pair.
   useEffect(() => {

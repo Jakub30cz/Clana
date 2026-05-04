@@ -20,8 +20,14 @@ import {
   type DropZone,
 } from "@/lib/paneTree";
 import { initialTreeFor, LayoutMode } from "@/state/layouts";
+import { scheduleAutosave, cancelAutosave, cancelAllAutosaves } from "@/lib/autosave";
 
 export type AccentName = "blue" | "amber" | "teal" | "rose" | "green" | "violet";
+
+export interface AutosaveSettings {
+  enabled: boolean;
+  debounceMs: number;
+}
 export type SidePanel = "files" | "git" | "search" | "settings" | null;
 export type ThemeName = "sketch" | "clean" | "mono" | "serif";
 export type ColorMode = "light" | "dark" | "auto";
@@ -59,6 +65,7 @@ interface PersistedSlice {
   sidePanel: SidePanel;
   recentEntries: RecentEntry[];
   claudePrefill: boolean;
+  autosave: AutosaveSettings;
 }
 
 interface State extends PersistedSlice {
@@ -100,6 +107,7 @@ interface State extends PersistedSlice {
   setPaletteOpen: (b: boolean) => void;
   setLayoutMenuOpen: (b: boolean) => void;
   setClaudePrefill: (b: boolean) => void;
+  setAutosave: (a: Partial<AutosaveSettings>) => void;
 
   // workspaces
   openFolder: (path: string) => void;
@@ -149,6 +157,7 @@ export const useStore = create<State>()(
       sidePanel: "files",
       recentEntries: [],
       claudePrefill: true,
+      autosave: { enabled: true, debounceMs: 800 },
       paletteOpen: false,
       layoutMenuOpen: false,
 
@@ -263,7 +272,8 @@ export const useStore = create<State>()(
           lastEditorPaneId: paneId,
         })),
 
-      closeFileInPane: (paneId, path) =>
+      closeFileInPane: (paneId, path) => {
+        cancelAutosave(path);
         set((s) => ({
           tree: replaceLeafInTree(s.tree, paneId, (l) => {
             if (l.kind !== "editor") return l;
@@ -276,7 +286,8 @@ export const useStore = create<State>()(
             const nextName = nextActive ? basenameOf(nextActive) : "untitled";
             return { ...l, tabs: nextTabs, activeTab: nextActive, name: nextName };
           }),
-        })),
+        }));
+      },
 
       setActiveTab: (paneId, path) =>
         set((s) => ({
@@ -288,7 +299,7 @@ export const useStore = create<State>()(
           lastEditorPaneId: paneId,
         })),
 
-      setFileContents: (path, contents) =>
+      setFileContents: (path, contents) => {
         set((s) => ({
           openFiles: produce(s.openFiles, (d) => {
             const f = d[path];
@@ -297,14 +308,18 @@ export const useStore = create<State>()(
               f.dirty = true;
             }
           }),
-        })),
+        }));
+        scheduleAutosave(path);
+      },
 
-      markFileSaved: (path) =>
+      markFileSaved: (path) => {
+        cancelAutosave(path);
         set((s) => ({
           openFiles: produce(s.openFiles, (d) => {
             if (d[path]) d[path].dirty = false;
           }),
-        })),
+        }));
+      },
 
       setLayout: (m) =>
         set(() => {
@@ -325,8 +340,10 @@ export const useStore = create<State>()(
       setPaletteOpen: (b) => set({ paletteOpen: b }),
       setLayoutMenuOpen: (b) => set({ layoutMenuOpen: b }),
       setClaudePrefill: (b) => set({ claudePrefill: b }),
+      setAutosave: (a) => set((s) => ({ autosave: { ...s.autosave, ...a } })),
 
-      openFolder: (path) =>
+      openFolder: (path) => {
+        cancelAllAutosaves();
         set((s) => {
           const name = basenameOf(path);
           const entry: RecentEntry = { kind: "folder", path, name, lastOpenedAt: Date.now() };
@@ -336,9 +353,11 @@ export const useStore = create<State>()(
             recentEntries: pushRecent(s.recentEntries, entry, recentKey(entry)),
             openFiles: {},
           };
-        }),
+        });
+      },
 
-      openWorkspaceFile: (filePath, file) =>
+      openWorkspaceFile: (filePath, file) => {
+        cancelAllAutosaves();
         set((s) => {
           const name = file.name || stripWorkspaceExt(basenameOf(filePath)) || "Untitled Workspace";
           const ws: WorkspaceFile = { ...file, filePath, name };
@@ -354,7 +373,8 @@ export const useStore = create<State>()(
             recentEntries: pushRecent(s.recentEntries, entry, recentKey(entry)),
             openFiles: {},
           };
-        }),
+        });
+      },
 
       addFoldersToWorkspace: (paths) =>
         set((s) => {
@@ -434,7 +454,10 @@ export const useStore = create<State>()(
           };
         }),
 
-      closeFolder: () => set({ workdir: "", workspace: null, openFiles: {} }),
+      closeFolder: () => {
+        cancelAllAutosaves();
+        set({ workdir: "", workspace: null, openFiles: {} });
+      },
 
       removeRecentEntry: (key) =>
         set((s) => ({ recentEntries: s.recentEntries.filter((r) => recentKey(r) !== key) })),
@@ -525,6 +548,7 @@ export const useStore = create<State>()(
         sidePanel: s.sidePanel,
         recentEntries: s.recentEntries,
         claudePrefill: s.claudePrefill,
+        autosave: s.autosave,
       }),
     }
   )

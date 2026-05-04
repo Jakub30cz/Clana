@@ -5,6 +5,7 @@ import { PaneLeaf } from "@/lib/paneTree";
 import { ipc, safeIpc } from "@/lib/ipc";
 import { useStore } from "@/state/store";
 import { getOrCreateTerminal } from "@/lib/terminalRegistry";
+import { useResolvedColorMode } from "@/lib/useResolvedColorMode";
 
 interface Props {
   pane: PaneLeaf;
@@ -16,6 +17,7 @@ export function TerminalPane({ pane, kind }: Props) {
   const workdir = useStore((s) => s.workdir);
   const workspace = useStore((s) => s.workspace);
   const claudePrefill = useStore((s) => s.claudePrefill);
+  const resolvedMode = useResolvedColorMode();
 
   useEffect(() => {
     const host = ref.current;
@@ -25,7 +27,7 @@ export function TerminalPane({ pane, kind }: Props) {
 
     const cwd = workspace?.folders[0] || workdir || ".";
 
-    void getOrCreateTerminal(pane.id, kind, cwd).then((entry) => {
+    void getOrCreateTerminal(pane.id, kind, cwd, resolvedMode).then((entry) => {
       if (cancelled) return;
       // Re-parent the persistent xterm container into our host. If the
       // pane is mounting fresh after a move, this is the first attach

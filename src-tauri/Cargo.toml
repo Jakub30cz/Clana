@@ -1,6 +1,6 @@
 [package]
 name = "clana"
-version = "0.1.0"
+version = "0.2.0"
 description = "Clana — minimalist vibe-coding IDE"
 authors = ["Jakub Jüthner <jakub.juthner@orgrez.cz>"]
 edition = "2021"

@@ -38,33 +38,64 @@ function readVar(name: string, fallback: string): string {
   return v || fallback;
 }
 
-function buildXtermTheme() {
-  const paper = readVar("--paper", "#f7f3ea");
-  const ink = readVar("--ink", "#1f1d1a");
-  const inkSoft = readVar("--ink-soft", "#4a463f");
-  const inkFaint = readVar("--ink-faint", "#8a857a");
-  const accent = readVar("--accent", "#c87a14");
-  const accent2 = readVar("--accent-2", "#3a7ec0");
+// ANSI palettes tuned for legibility against light vs dark backgrounds.
+// Hardcoded values prevent dark-on-dark when CSS-only colors would clash.
+const LIGHT_ANSI = {
+  red: "#c03c3c",
+  green: "#3a8a3a",
+  yellow: "#b58900",
+  blue: "#1c6dd0",
+  magenta: "#a64ea6",
+  cyan: "#2f8a8a",
+  brightRed: "#e05050",
+  brightGreen: "#5aa05a",
+  brightYellow: "#e09a30",
+  brightBlue: "#3a7ec0",
+  brightMagenta: "#c66ec6",
+  brightCyan: "#4eaeae",
+};
+
+const DARK_ANSI = {
+  red: "#ff6b6b",
+  green: "#7ee787",
+  yellow: "#f1fa8c",
+  blue: "#79b8ff",
+  magenta: "#ff79c6",
+  cyan: "#8be9fd",
+  brightRed: "#ff8a8a",
+  brightGreen: "#a8f0a8",
+  brightYellow: "#fff39c",
+  brightBlue: "#a8d3ff",
+  brightMagenta: "#ffa3d9",
+  brightCyan: "#b3f1ff",
+};
+
+function buildXtermTheme(mode: "light" | "dark") {
+  const paper = readVar("--paper", mode === "dark" ? "#1a1a1c" : "#f7f3ea");
+  const ink = readVar("--ink", mode === "dark" ? "#e8e6e0" : "#1f1d1a");
+  const inkSoft = readVar("--ink-soft", mode === "dark" ? "#b8b5ad" : "#4a463f");
+  const inkFaint = readVar("--ink-faint", mode === "dark" ? "#6a6760" : "#8a857a");
+  const ansi = mode === "dark" ? DARK_ANSI : LIGHT_ANSI;
   return {
     background: paper,
     foreground: ink,
     cursor: ink,
     cursorAccent: paper,
-    black: ink,
-    red: "#c03c3c",
-    green: "#3a8a3a",
-    yellow: accent,
-    blue: accent2,
-    magenta: "#a64ea6",
-    cyan: "#2f8a8a",
+    black: mode === "dark" ? inkFaint : ink,
+    red: ansi.red,
+    green: ansi.green,
+    yellow: ansi.yellow,
+    blue: ansi.blue,
+    magenta: ansi.magenta,
+    cyan: ansi.cyan,
     white: inkSoft,
-    brightBlack: inkFaint,
-    brightRed: "#e05050",
-    brightGreen: "#5aa05a",
-    brightYellow: "#e09a30",
-    brightBlue: "#5a9ad6",
-    brightMagenta: "#c66ec6",
-    brightCyan: "#4eaeae",
+    brightBlack: mode === "dark" ? inkSoft : inkFaint,
+    brightRed: ansi.brightRed,
+    brightGreen: ansi.brightGreen,
+    brightYellow: ansi.brightYellow,
+    brightBlue: ansi.brightBlue,
+    brightMagenta: ansi.brightMagenta,
+    brightCyan: ansi.brightCyan,
     brightWhite: ink,
     selectionBackground: readVar("--accent-soft", "rgba(255,165,80,0.3)"),
   };
@@ -74,6 +105,7 @@ export async function getOrCreateTerminal(
   paneId: string,
   kind: "shell" | "claude",
   cwd: string,
+  mode: "light" | "dark" = "light",
 ): Promise<TerminalEntry> {
   const existing = registry.get(paneId);
   if (existing) return existing;
@@ -86,7 +118,7 @@ export async function getOrCreateTerminal(
     fontFamily: 'var(--font-mono), "JetBrains Mono", ui-monospace, monospace',
     fontSize: 12,
     cursorBlink: true,
-    theme: buildXtermTheme(),
+    theme: buildXtermTheme(mode),
   });
   const fit = new FitAddon();
   term.loadAddon(fit);
@@ -152,4 +184,14 @@ export function getTerminal(paneId: string): TerminalEntry | undefined {
 
 export function activeTerminalIds(): string[] {
   return Array.from(registry.keys());
+}
+
+/** Re-apply theme to all live xterm instances. Called by App when the user
+ *  switches color theme or light/dark mode at runtime. xterm.js supports
+ *  hot theme updates via the `options.theme` setter. */
+export function refreshAllTerminalThemes(mode: "light" | "dark"): void {
+  const next = buildXtermTheme(mode);
+  for (const entry of registry.values()) {
+    entry.term.options.theme = next;
+  }
 }

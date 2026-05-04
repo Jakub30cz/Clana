@@ -39,6 +39,8 @@ export function WinChrome({ title = "clana", subtitle, children }: Props) {
           background: "var(--paper-2)",
           flexShrink: 0, gap: 12,
           minHeight: 32,
+          position: "relative",
+          zIndex: 10,
         }}
       >
         {/* macOS overlay leaves space for traffic lights via padding */}
@@ -52,8 +54,15 @@ export function WinChrome({ title = "clana", subtitle, children }: Props) {
           <span style={{ fontWeight: 600, color: "var(--ink)" }}>{title}</span>
           {sub && <span style={{ opacity: 0.7 }}> — {sub}</span>}
         </div>
-        <PaneToolbar />
-        <LayoutSwitcher />
+        {/* Drag-region opt-out: child elements inherit data-tauri-drag-region
+            from the title bar parent, which on macOS Overlay style intercepts
+            clicks as drag starts. These wrappers restore normal click behavior. */}
+        <div data-tauri-drag-region="false" style={{ display: "flex", alignItems: "center", gap: 4 }}>
+          <PaneToolbar />
+        </div>
+        <div data-tauri-drag-region="false" style={{ display: "flex", alignItems: "center" }}>
+          <LayoutSwitcher />
+        </div>
       </div>
       <div style={{ flex: 1, minHeight: 0, display: "flex", flexDirection: "column", position: "relative" }}>
         {children}

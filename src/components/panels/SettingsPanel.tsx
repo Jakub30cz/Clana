@@ -65,6 +65,8 @@ export function SettingsPanel() {
   const setClaudePrefill = useStore((s) => s.setClaudePrefill);
   const syntaxPalette = useStore((s) => s.syntaxPalette);
   const setSyntaxPalette = useStore((s) => s.setSyntaxPalette);
+  const autosave = useStore((s) => s.autosave);
+  const setAutosave = useStore((s) => s.setAutosave);
 
   const previewMode: "light" | "dark" =
     mode === "auto"
@@ -182,6 +184,44 @@ export function SettingsPanel() {
           value={claudePrefill}
           onChange={setClaudePrefill}
         />
+      </Group>
+
+      <Group label="Editor">
+        <ToggleRow
+          label="Autosave"
+          hint="Automatically writes changes to disk after a short pause. Cmd+S still works for an immediate save."
+          value={autosave.enabled}
+          onChange={(v) => setAutosave({ enabled: v })}
+        />
+        {autosave.enabled && (
+          <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "4px 0 4px 46px" }}>
+            <span style={{ color: "var(--ink-soft)", fontSize: 12 }}>Delay</span>
+            <input
+              type="number"
+              min={100}
+              max={10000}
+              step={100}
+              value={autosave.debounceMs}
+              onChange={(e) => {
+                const n = Number(e.target.value);
+                if (Number.isFinite(n) && n >= 100 && n <= 10000) {
+                  setAutosave({ debounceMs: n });
+                }
+              }}
+              style={{
+                width: 80,
+                padding: "2px 6px",
+                background: "var(--paper)",
+                color: "var(--ink)",
+                border: "1.5px solid var(--rule)",
+                borderRadius: 4,
+                fontFamily: "var(--font-mono)",
+                fontSize: 12,
+              }}
+            />
+            <span style={{ color: "var(--ink-faint)", fontSize: 12 }}>ms</span>
+          </div>
+        )}
       </Group>
 
       <Group label="Shortcuts">
